@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Niece Hostel — Guest Info</title>
+  <style>
+    :root {
+      --green:  #2e4a3d;
+      --green2: #3d6b58;
+      --pink:   #f5a99d;
+      --yellow: #f7c940;
+      --bg:     #f8f5f2;
+      --white:  #ffffff;
+      --text:   #2d2d2d;
+      --muted:  #888;
+      --border: #e8e0d8;
+      --red:    #e63946;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); max-width: 600px; margin: 0 auto; min-height: 100vh; }
+
+    /* ── HEADER ── */
+    .header { background: var(--green); padding: 24px 20px 18px; text-align: center; }
+    .header img { width: 110px; height: 110px; object-fit: contain; border-radius: 12px; background: var(--bg); padding: 6px; }
+    .header-logo-fallback { display: none; }
+    .header img.broken { display: none; }
+    .header img.broken + .header-logo-fallback { display: block; }
+    .header-logo-fallback .logo-text { font-size: 1.6rem; font-weight: 800; color: var(--white); letter-spacing: 3px; }
+    .header-logo-fallback .logo-sub  { font-size: 0.75rem; color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-top: 3px; }
+    .header-tagline { font-size: 0.78rem; color: rgba(255,255,255,0.55); letter-spacing: 1px; margin-top: 8px; }
+
+    /* ── NO SMOKING BANNER ── */
+    .smoke-banner { margin: 14px 14px 0; background: var(--white); border: 2px solid var(--red); border-radius: 14px; padding: 16px 14px; text-align: center; }
+    .smoke-banner .icon { font-size: 2.4rem; }
+    .smoke-banner #sb-content p { font-size: 0.88rem; line-height: 1.6; margin: 4px 0; color: var(--text); }
+    .smoke-banner #sb-content p:first-child { font-weight: 700; font-size: 0.92rem; margin-top: 6px; }
+    .smoke-banner #sb-content p:nth-child(2) { font-weight: 800; font-size: 0.95rem; color: var(--red); }
+
+    /* ── SEARCH BAR ── */
+    .search-wrap { padding: 12px 14px 0; position: relative; }
+    .search-inner { display: flex; align-items: center; background: var(--white); border: 1.5px solid var(--border); border-radius: 99px; padding: 0 14px; gap: 8px; transition: border-color .2s; }
+    .search-inner:focus-within { border-color: var(--green); }
+    .search-inner .s-icon { color: var(--green); font-size: 1rem; flex-shrink: 0; }
+    .search-inner input { flex: 1; border: none; outline: none; padding: 11px 0; font-size: 0.88rem; background: transparent; color: var(--text); }
+    .search-inner input::placeholder { color: #bbb; }
+    .s-clear { background: none; border: none; cursor: pointer; color: #bbb; font-size: 1.1rem; padding: 0 4px; display: none; }
+    .s-clear.show { display: block; }
+    .search-hint { font-size: 0.73rem; color: var(--muted); padding: 5px 18px 0; }
+    .search-no-result { display: none; text-align: center; padding: 30px 20px; font-size: 0.88rem; color: var(--muted); }
+    .search-no-result.show { display: block; }
+
+    /* ── LANGUAGE BAR ── */
+    .lang-bar { display: flex; gap: 8px; padding: 12px 14px; justify-content: center; flex-wrap: wrap; }
+    .lang-btn { padding: 6px 16px; border: 1.5px solid var(--border); border-radius: 99px; background: var(--white); cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--muted); transition: all .2s; }
+    .lang-btn.active { background: var(--green); color: var(--white); border-color: var(--green); }
+
+    /* ── ACCORDION ── */
+    .accordion { margin-bottom: 90px; }
+    .acc-item { background: var(--white); border-bottom: 1px solid var(--border); transition: opacity .2s; }
+    .acc-item.search-hidden { display: none; }
+    .acc-item.search-match .acc-header { background: #f0f8f5; }
+    .acc-header { display: flex; align-items: center; padding: 16px 18px; cursor: pointer; user-select: none; gap: 12px; }
+    .acc-header .ico { font-size: 1.15rem; min-width: 26px; }
+    .acc-header .lbl { flex: 1; font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .acc-header .chev { font-size: 0.7rem; color: #bbb; transition: transform .25s; }
+    .acc-item.open .chev { transform: rotate(180deg); }
+    .acc-body { display: none; padding: 0 18px 18px; font-size: 0.875rem; line-height: 1.72; color: #444; border-top: 1px solid #f5f0eb; }
+    .acc-item.open .acc-body { display: block; }
+    .acc-body p { margin-bottom: 8px; }
+    .acc-body p:last-child { margin-bottom: 0; }
+
+    /* Content helpers */
+    .hl-red  { color: var(--red); font-weight: 700; }
+    .hl-grn  { color: var(--green); font-weight: 700; }
+    .hl-ylw  { color: #b8920a; font-weight: 700; }
+    .info-box { border-radius: 10px; padding: 12px 14px; margin: 10px 0; }
+    .info-box.warn  { background: #fff5f5; border-left: 4px solid var(--red); }
+    .info-box.tip   { background: #f0f8f5; border-left: 4px solid var(--green2); }
+    .info-box.note  { background: #fffbee; border-left: 4px solid var(--yellow); }
+    tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin: 10px 0; }
+    th, td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+    th { background: #f5f0eb; font-weight: 700; }
+
+    /* FAQ sub-items */
+    .faq-list { list-style: none; margin-top: 6px; }
+    .faq-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+    .faq-q { padding: 11px 14px; font-weight: 600; font-size: 0.875rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fafaf8; }
+    .faq-q:hover { background: #f5f0eb; }
+    .faq-q .fq { flex: 1; }
+    .faq-q .fc { font-size: 0.65rem; color: #bbb; transition: transform .2s; }
+    .faq-item.open .fc { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 10px 14px; font-size: 0.85rem; line-height: 1.65; color: #555; background: var(--white); border-top: 1px solid var(--border); }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ── FOOTER ── */
+    footer { position: fixed; bottom: 0; left: 0; right: 0; max-width: 600px; margin: 0 auto; background: var(--green); color: rgba(255,255,255,0.65); text-align: center; padding: 9px 12px; font-size: 0.73rem; }
+    footer span { color: var(--white); font-weight: 700; }
+
+    /* ── ADMIN TRIGGER ── */
+    #adminTrigger { position: fixed; bottom: 44px; right: 8px; width: 28px; height: 28px; background: transparent; border: 1px solid rgba(0,0,0,0.08); border-radius: 50%; cursor: pointer; font-size: 0.75rem; color: rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center; z-index: 900; transition: opacity .3s; }
+    #adminTrigger:hover { color: rgba(0,0,0,0.45); border-color: rgba(0,0,0,0.25); }
+
+    /* ── OVERLAY BACKDROP ── */
+    .overlay-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: flex-end; justify-content: center; }
+    .overlay-bg.show { display: flex; }
+
+    /* ── LOGIN MODAL ── */
+    .login-modal { background: var(--white); border-radius: 20px 20px 0 0; padding: 28px 24px 36px; width: 100%; max-width: 600px; }
+    .login-modal h2 { font-size: 1.1rem; color: var(--green); font-weight: 800; margin-bottom: 6px; text-align: center; }
+    .login-modal p.sub { font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 20px; }
+    .login-modal label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--green); margin-bottom: 5px; }
+    .login-modal input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 0.92rem; outline: none; margin-bottom: 14px; transition: border-color .2s; }
+    .login-modal input:focus { border-color: var(--green); }
+    .pin-row { display: flex; gap: 10px; }
+    .pin-row input { flex: 1; letter-spacing: 6px; font-size: 1.1rem; text-align: center; }
+    .login-modal .btn-login { width: 100%; background: var(--green); color: var(--white); border: none; border-radius: 12px; padding: 13px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+    .login-modal .btn-login:hover { background: var(--green2); }
+    .login-modal .btn-cancel { width: 100%; background: none; border: 1.5px solid var(--border); border-radius: 12px; padding: 11px; font-size: 0.88rem; cursor: pointer; color: var(--muted); }
+    .forgot-link { text-align: center; margin: 10px 0 0; font-size: 0.78rem; color: var(--green2); cursor: pointer; text-decoration: underline; }
+    .login-error { background: #fff0f0; color: var(--red); border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; text-align: center; margin-bottom: 10px; display: none; }
+    .login-error.show { display: block; }
+    .lockout-msg { background: #fff0f0; color: var(--red); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; text-align: center; display: none; }
+    .lockout-msg.show { display: block; }
+
+    /* ── ADMIN PANEL ── */
+    .admin-panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1100; flex-direction: column; max-width: 600px; margin: 0 auto; }
+    .admin-panel.show { display: flex; }
+    .admin-top { background: var(--green); color: var(--white); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .admin-top h3 { font-size: 0.95rem; font-weight: 800; letter-spacing: 1px; }
+    .admin-top .owner-badge { font-size: 0.72rem; background: var(--yellow); color: var(--green); border-radius: 6px; padding: 2px 8px; font-weight: 700; }
+    .admin-top-right { display: flex; gap: 10px; align-items: center; }
+    .btn-save { background: var(--yellow); color: var(--green); border: none; border-radius: 8px; padding: 7px 16px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+    .btn-logout { background: rgba(255,255,255,0.18); color: var(--white); border: none; border-radius: 8px; padding: 7px 14px; font-size: 0.8rem; cursor: pointer; }
+    .btn-settings { background: rgba(255,255,255,0.18); color: var(--white); border: none; border-radius: 8px; padding: 7px 12px; font-size: 0.9rem; cursor: pointer; }
+    /* Settings overlay */
+    .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1200; align-items: flex-end; justify-content: center; }
+    .settings-overlay.show { display: flex; }
+    .settings-sheet { background: var(--white); border-radius: 20px 20px 0 0; padding: 24px 22px 36px; width: 100%; max-width: 600px; }
+    .settings-sheet h3 { font-size: 1rem; font-weight: 800; color: var(--green); margin-bottom: 4px; }
+    .settings-sheet p.sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 16px; }
+    .settings-sheet label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--green); margin: 12px 0 5px; }
+    .settings-sheet input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 0.92rem; outline: none; font-family: inherit; }
+    .settings-sheet input:focus { border-color: var(--green); }
+    .settings-sheet .btn-upd { background: var(--green); color: var(--white); border: none; border-radius: 12px; padding: 13px; width: 100%; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 16px; }
+    .settings-sheet .btn-close-s { background: none; border: 1.5px solid var(--border); border-radius: 12px; padding: 11px; width: 100%; font-size: 0.88rem; cursor: pointer; color: var(--muted); margin-top: 10px; }
+    .settings-msg { font-size: 0.8rem; text-align: center; margin-top: 8px; color: var(--green); display: none; }
+    .settings-msg.show { display: block; }
+    /* Sections manager */
+    .sec-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .sec-row .sec-icon { font-size: 1.2rem; min-width: 28px; text-align: center; }
+    .sec-row .sec-name { flex: 1; font-size: 0.88rem; font-weight: 600; }
+    .sec-row .sec-name input { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 0.85rem; outline: none; font-family: inherit; }
+    .sec-row .sec-name input:focus { border-color: var(--green); }
+    .sec-row .sec-vis { font-size: 1rem; cursor: pointer; opacity: 0.4; }
+    .sec-row .sec-vis.on { opacity: 1; }
+    .sec-row .sec-del { font-size: 0.85rem; cursor: pointer; color: var(--red); opacity: 0.6; }
+    .sec-row .sec-del:hover { opacity: 1; }
+    .sec-row .sec-move { display: flex; flex-direction: column; gap: 2px; }
+    .sec-row .sec-move button { background: none; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 0.6rem; padding: 1px 4px; color: var(--muted); line-height: 1; }
+    .sec-row .sec-move button:hover { background: var(--border); }
+    .btn-add-sec { display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 12px; background: #f0f8f5; border: 2px dashed var(--green2); border-radius: 10px; padding: 11px 14px; font-size: 0.88rem; font-weight: 600; color: var(--green); cursor: pointer; }
+    .btn-add-sec:hover { background: #e0f4ec; }
+    .new-sec-form { background: #f8f5f2; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 10px; display: none; }
+    .new-sec-form.show { display: block; }
+    .new-sec-form input, .new-sec-form select { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 0.88rem; margin-bottom: 8px; outline: none; font-family: inherit; }
+    .new-sec-form input:focus { border-color: var(--green); }
+    .new-sec-form .btn-create { background: var(--green); color: white; border: none; border-radius: 8px; padding: 9px; width: 100%; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+    .sec-lang-tabs { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+    .sec-lang-tab { padding: 3px 10px; border: 1.5px solid var(--border); border-radius: 99px; font-size: 0.72rem; font-weight: 600; color: var(--muted); cursor: pointer; background: white; }
+    .sec-lang-tab.active { background: var(--green); color: white; border-color: var(--green); }
+    .icon-picker { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .icon-opt { font-size: 1.2rem; cursor: pointer; padding: 4px 6px; border-radius: 6px; border: 2px solid transparent; }
+    .icon-opt.selected { border-color: var(--green); background: #f0f8f5; }
+    .icon-opt:hover { background: #f5f0eb; }
+    /* Section tabs */
+    .admin-sec-tabs { display: flex; overflow-x: auto; background: var(--white); border-bottom: 1px solid var(--border); flex-shrink: 0; scrollbar-width: none; }
+    .admin-sec-tabs::-webkit-scrollbar { display: none; }
+    .sec-tab { flex-shrink: 0; padding: 11px 14px; font-size: 0.78rem; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .sec-tab.active { color: var(--green); border-color: var(--green); }
+    /* Lang tabs */
+    .admin-lang-row { display: flex; gap: 6px; padding: 10px 14px; background: #faf8f5; flex-shrink: 0; border-bottom: 1px solid var(--border); }
+    .admin-lang-btn { padding: 5px 14px; border: 1.5px solid var(--border); border-radius: 99px; background: var(--white); font-size: 0.78rem; font-weight: 600; color: var(--muted); cursor: pointer; }
+    .admin-lang-btn.active { background: var(--green); color: var(--white); border-color: var(--green); }
+    /* Editor area */
+    .admin-editor { flex: 1; overflow-y: auto; padding: 14px; }
+    .admin-editor label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+    .admin-editor textarea { width: 100%; min-height: 280px; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 0.87rem; line-height: 1.65; outline: none; resize: vertical; font-family: inherit; color: var(--text); }
+    .admin-editor textarea:focus { border-color: var(--green); }
+    .editor-hint { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+    .admin-editor .faq-editor-hint { background: #fffbee; border-left: 3px solid var(--yellow); border-radius: 6px; padding: 8px 12px; font-size: 0.75rem; color: #666; margin-bottom: 10px; }
+    /* Settings tab */
+    .settings-form label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--green); margin: 14px 0 5px; }
+    .settings-form input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; outline: none; font-family: inherit; }
+    .settings-form input:focus { border-color: var(--green); }
+    .settings-form .btn-upd { background: var(--green); color: var(--white); border: none; border-radius: 10px; padding: 11px; width: 100%; font-size: 0.88rem; font-weight: 700; cursor: pointer; margin-top: 14px; }
+    .settings-form .settings-msg { font-size: 0.78rem; text-align: center; margin-top: 8px; color: var(--green2); display: none; }
+    .settings-form .settings-msg.show { display: block; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: var(--white); padding: 10px 22px; border-radius: 99px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 9999; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── FORGOT PIN CONFIRM ── */
+    .forgot-modal { background: var(--white); border-radius: 20px 20px 0 0; padding: 28px 24px 36px; width: 100%; max-width: 600px; text-align: center; }
+    .forgot-modal h3 { font-size: 1rem; font-weight: 800; color: var(--green); margin-bottom: 8px; }
+    .forgot-modal p { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
+    .forgot-modal .email-pill { background: #f0f8f5; color: var(--green); border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: 0.88rem; margin-bottom: 20px; display: inline-block; }
+    .forgot-modal .btn-send { background: var(--green); color: var(--white); border: none; border-radius: 12px; padding: 13px; width: 100%; font-size: 0.92rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+    .forgot-modal .btn-back { background: none; border: 1.5px solid var(--border); border-radius: 12px; padding: 11px; width: 100%; font-size: 0.88rem; cursor: pointer; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <img src="./niece-logo.png" alt="Niece Hostel" onerror="this.classList.add('broken')" />
+  <div class="header-logo-fallback">
+    <div class="logo-text">NIECE HOSTEL</div>
+    <div class="logo-sub">GUEST INFORMATION</div>
+  </div>
+  <div class="header-tagline" id="header-tagline">Welcome — we're glad you're here 🌿</div>
+</div>
+
+<!-- ═══ NO SMOKING BANNER ═══ -->
+<div class="smoke-banner">
+  <div class="icon">🚭</div>
+  <div id="sb-content"></div>
+</div>
+
+<!-- ═══ SEARCH BAR ═══ -->
+<div class="search-wrap">
+  <div class="search-inner">
+    <span class="s-icon">🔍</span>
+    <input type="search" id="searchInput" placeholder="Search for information…" oninput="doSearch(this.value)" />
+    <button class="s-clear" id="sClear" onclick="clearSearch()">✕</button>
+  </div>
+</div>
+<div class="search-hint" id="searchHint"></div>
+<div class="search-no-result" id="noResult">😕 No results found. Try different keywords.</div>
+
+<!-- ═══ LANGUAGE BAR ═══ -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('en',this)">English</button>
+  <button class="lang-btn" onclick="setLang('th',this)">ภาษาไทย</button>
+  <button class="lang-btn" onclick="setLang('zh',this)">中文</button>
+  <button class="lang-btn" onclick="setLang('ru',this)">Русский</button>
+</div>
+
+<!-- ═══ ACCORDION ═══ -->
+<div class="accordion" id="accordion">
+  <!-- built dynamically by JS -->
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer><span>NIECE HOSTEL</span> — Front Desk: Extension 1</footer>
+
+<!-- ═══ ADMIN TRIGGER ═══ -->
+<button id="adminTrigger" onclick="openLoginModal()" title="Owner">⚙</button>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ LOGIN MODAL ═══ -->
+<div class="overlay-bg" id="loginOverlay">
+  <div class="login-modal">
+    <h2>🔐 Owner Login</h2>
+    <p class="sub">Enter your 6-digit PIN to manage content</p>
+    <div class="login-error" id="loginError"></div>
+    <div class="lockout-msg" id="lockoutMsg"></div>
+    <div id="loginForm">
+      <label>PIN</label>
+      <div class="pin-row">
+        <input type="password" id="pinInput" placeholder="••••••" maxlength="6" inputmode="numeric"
+          onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <br/>
+      <button class="btn-login" onclick="doLogin()">Login</button>
+      <button class="btn-cancel" onclick="closeLoginModal()">Cancel</button>
+      <div class="forgot-link" onclick="showForgot()">Forgot PIN?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FORGOT PIN MODAL ═══ -->
+<div class="overlay-bg" id="forgotOverlay">
+  <div class="forgot-modal">
+    <h3>📧 Forgot your PIN?</h3>
+    <p>We'll open your email app pre-filled with your current PIN and send it to:</p>
+    <div class="email-pill">bzaataan@gmail.com</div>
+    <button class="btn-send" onclick="sendPinEmail()">Open Email App →</button>
+    <button class="btn-back" onclick="closeForgot()">← Back to Login</button>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS OVERLAY ═══ -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-sheet">
+    <h3>⚙️ Settings</h3>
+    <p class="sub">Change your profile name or PIN. Leave blank to keep current value.</p>
+
+    <label>Profile Name <span style="color:var(--muted);font-weight:400" id="curProfileLabel"></span></label>
+    <input type="text" id="newProfile" placeholder="New profile name" autocomplete="off" />
+
+    <label>New PIN</label>
+    <input type="password" id="newPin1" placeholder="New PIN (numbers only)" inputmode="numeric" maxlength="8" />
+
+    <label>Confirm New PIN</label>
+    <input type="password" id="newPin2" placeholder="Repeat new PIN" inputmode="numeric" maxlength="8" />
+
+    <div class="settings-msg" id="settingsMsg"></div>
+    <button class="btn-upd" onclick="updateSettings()">Update Settings</button>
+    <button class="btn-close-s" onclick="closeSettings()">← Back</button>
+  </div>
+</div>
+
+<!-- ═══ ADMIN PANEL ═══ -->
+<div class="admin-panel" id="adminPanel">
+  <!-- Top bar -->
+  <div class="admin-top">
+    <div>
+      <div style="font-size:0.65rem;opacity:.65;margin-bottom:2px;">Logged in as <span id="adminProfileName"></span></div>
+      <h3>✏️ EDIT CONTENT</h3>
+    </div>
+    <div class="admin-top-right">
+      <button class="btn-settings" onclick="openSettings()">⚙️</button>
+      <button class="btn-save" onclick="saveAllContent()">💾 Save</button>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Section tabs — built dynamically -->
+  <div class="admin-sec-tabs" id="adminSecTabs"></div>
+
+  <!-- Language tabs -->
+  <div class="admin-lang-row" id="adminLangRow">
+    <button class="admin-lang-btn active" onclick="selectAdminLang('en',this)">EN</button>
+    <button class="admin-lang-btn" onclick="selectAdminLang('th',this)">TH</button>
+    <button class="admin-lang-btn" onclick="selectAdminLang('zh',this)">中文</button>
+    <button class="admin-lang-btn" onclick="selectAdminLang('ru',this)">RU</button>
+  </div>
+
+  <!-- Editor -->
+  <div class="admin-editor" id="adminEditor">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+
+/* ─────────────────────────────────────────
+   DEFAULT CONTENT — each section × 4 langs
+   Separate lines become separate paragraphs.
+   ───────────────────────────────────────── */
+const DEFAULTS = {
+  labels: {
+    en: { smoking:'No Smoking Policy', wifi:'Wi-Fi Information', cleaning:'Room Cleaning Service', hotel:'Hotel Information', aircon:'Air Conditioner', luggage:'Luggage Storage', extra:'Extra Charges', faq:'Common Questions (FAQ)', survey:'Feedback & Questionnaire' },
+    th: { smoking:'นโยบายห้ามสูบบุหรี่', wifi:'ข้อมูล Wi-Fi', cleaning:'บริการทำความสะอาด', hotel:'ข้อมูลโรงแรม', aircon:'เครื่องปรับอากาศ', luggage:'บริการฝากกระเป๋า', extra:'ค่าใช้จ่ายเพิ่มเติม', faq:'คำถามที่พบบ่อย', survey:'แบบสอบถาม' },
+    zh: { smoking:'禁烟政策', wifi:'Wi-Fi信息', cleaning:'客房清洁服务', hotel:'酒店信息', aircon:'空调信息', luggage:'行李寄存', extra:'额外费用', faq:'常见问题 FAQ', survey:'反馈问卷' },
+    ru: { smoking:'Запрет курения', wifi:'Информация о Wi-Fi', cleaning:'Уборка номера', hotel:'Информация об отеле', aircon:'Кондиционер', luggage:'Хранение багажа', extra:'Дополнительные сборы', faq:'Частые вопросы FAQ', survey:'Обратная связь' }
+  },
+  content: {
+    en: {
+      smoking: `All rooms are designated non-smoking — including cigarettes, e-cigarettes, and all vaping devices.\nIf evidence of smoking is found in your room, a special cleaning fee of 30,000 YEN will be charged.\nDesignated smoking areas are available outside the building.`,
+      wifi: `Network name: NIECE_HOSTEL_GUEST\nPassword: nicestay2024\nFree Wi-Fi is available throughout the hostel.\nFor connection issues, please contact the front desk at Extension 1.`,
+      cleaning: `ECO Service (all stays): Towel exchange + trash collection only, no room entry. Place used towels in the RED eco-bag outside your door before 1:00 PM. Fresh towels will be left in the BLUE eco-bag.\n\n2–3 Night Stays: Regular housekeeping is not provided. To request cleaning, place the "Please Clean" magnet on your door by 1:00 PM.\n\n4+ Night Stays: Full cleaning every 3 days. Other days are ECO service days.`,
+      hotel: `Check-out time: 11:00 AM\nLate check-out: 1,000 YEN per hour after 11:00 AM.\nPlease return your key card to the box on the 1st floor.\n\nAmenities: Toothbrushes and toiletries are available free of charge in the 1F lobby.\n\nFacilities (2F): Microwave, vending machine, and coin laundry are on the 2nd floor.\n\nIce: No ice machine — please ask at the front desk.\n\nEntrance: Locked from midnight (00:00) to 05:00. Use your key card on the sensor at the right of the entrance.`,
+      aircon: `Each room has an individual air conditioner and remote control.\nPlease adjust to your preferred temperature.\nRemember to turn off the air conditioner when leaving the room.\nFor any issues, call the front desk at Extension 1.`,
+      luggage: `Luggage storage is available on the day of check-in and check-out only.\nWe are unable to store luggage for more than one day.\nPlease ask at the front desk — storage is free of charge.`,
+      extra: `Late check-out (after 11:00 AM): 1,000 YEN per hour\nSmoking violation (special cleaning): 30,000 YEN\nLost key card: Please ask at front desk\nRoom damage: Assessed at actual replacement cost\n\nAll charges will be billed to the card on file or collected at check-out.`,
+      faq: `Q: What time is check-in?\nA: Check-in is available from 3:00 PM. Early check-in may be available — please ask at the front desk.\n\nQ: Is there a curfew?\nA: No curfew, but the entrance is locked from midnight to 5:00 AM. Use your key card to enter.\n\nQ: Where is the nearest convenience store?\nA: There is a convenience store approximately 2 minutes walk from the hostel.\n\nQ: Is breakfast included?\nA: Breakfast is not included. Please ask the front desk for nearby restaurant recommendations.\n\nQ: Can I get more towels?\nA: Yes! Extra towels are available at the front desk.`,
+      survey: `We would love to hear about your stay!\nYour feedback helps us improve for all guests.\n\nPlease fill out our short questionnaire:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nThank you for choosing Niece Hostel! 🌿`
+    },
+    th: {
+      smoking: `ห้ามสูบบุหรี่ในทุกห้องอย่างเด็ดขาด รวมถึงบุหรี่, บุหรี่ไฟฟ้า และอุปกรณ์สูบไอทุกชนิด\nหากพบหลักฐานการสูบบุหรี่ในห้อง จะเรียกเก็บค่าทำความสะอาดพิเศษ 30,000 เยน\nมีพื้นที่สูบบุหรี่กำหนดไว้ด้านนอกอาคาร`,
+      wifi: `ชื่อเครือข่าย: NIECE_HOSTEL_GUEST\nรหัสผ่าน: nicestay2024\nWi-Fi ฟรีตลอดทั่วโฮสเทล\nหากมีปัญหาการเชื่อมต่อ ติดต่อแผนกต้อนรับที่ ต่อ 1`,
+      cleaning: `บริการ ECO (ทุกการเข้าพัก): เปลี่ยนผ้าเช็ดตัว + เก็บขยะ โดยไม่เข้าห้อง วางผ้าเช็ดตัวที่ใช้แล้วในถุง eco สีแดง ไว้หน้าประตูก่อน 13:00 น. ผ้าเช็ดตัวใหม่จะอยู่ในถุง eco สีน้ำเงิน\n\nพักค้าง 2–3 คืน: ไม่มีบริการทำความสะอาดปกติ หากต้องการให้ทำความสะอาด วางแม่เหล็ก "Please Clean" บนประตูก่อน 13:00 น.\n\nพัก 4 คืนขึ้นไป: ทำความสะอาดเต็มรูปแบบทุก 3 วัน วันอื่นใช้บริการ ECO`,
+      hotel: `เช็คเอาต์: 11:00 น.\nเช็คเอาต์ช้า: 1,000 เยนต่อชั่วโมง หลัง 11:00 น.\nกรุณาคืนบัตรกุญแจที่กล่องชั้น 1\n\nสิ่งอำนวยความสะดวก: แปรงสีฟันและของใช้ฟรีที่ล็อบบี้ชั้น 1\n\nสิ่งอำนวยความสะดวก (ชั้น 2): ไมโครเวฟ, ตู้ขายของอัตโนมัติ และเครื่องซักผ้าหยอดเหรียญ\n\nน้ำแข็ง: ไม่มีเครื่องทำน้ำแข็ง ขอได้ที่แผนกต้อนรับ\n\nทางเข้า: ล็อคตั้งแต่ 00:00 ถึง 05:00 น. ใช้บัตรกุญแจแตะที่เซ็นเซอร์ด้านขวาของทางเข้า`,
+      aircon: `ทุกห้องมีเครื่องปรับอากาศพร้อมรีโมทคอนโทรลส่วนตัว\nปรับอุณหภูมิตามที่ต้องการได้\nกรุณาปิดเครื่องปรับอากาศเมื่อออกจากห้องเพื่อประหยัดพลังงาน\nหากมีปัญหา ติดต่อแผนกต้อนรับที่ ต่อ 1`,
+      luggage: `บริการฝากกระเป๋าเฉพาะวันเช็คอินและเช็คเอาต์เท่านั้น\nไม่สามารถฝากกระเป๋าเกิน 1 วัน\nติดต่อแผนกต้อนรับ บริการฟรี`,
+      extra: `เช็คเอาต์ช้า (หลัง 11:00 น.): 1,000 เยนต่อชั่วโมง\nฝ่าฝืนนโยบายสูบบุหรี่ (ค่าทำความสะอาด): 30,000 เยน\nบัตรกุญแจสูญหาย: กรุณาถามที่แผนกต้อนรับ\nความเสียหายในห้อง: ตามความเสียหายจริง\n\nค่าใช้จ่ายทั้งหมดจะเรียกเก็บจากบัตรเครดิตหรือชำระเมื่อเช็คเอาต์`,
+      faq: `Q: เช็คอินได้กี่โมง?\nA: เช็คอินตั้งแต่ 15:00 น. อาจมีเช็คอินเร็วได้ กรุณาถามที่แผนกต้อนรับ\n\nQ: มีเคอร์ฟิวมั้ย?\nA: ไม่มี แต่ประตูทางเข้าล็อคตั้งแต่ 00:00 ถึง 05:00 น. ใช้บัตรกุญแจเข้าได้\n\nQ: ร้านสะดวกซื้ออยู่ไหน?\nA: มีร้านสะดวกซื้อห่างออกไปประมาณ 2 นาทีเดิน\n\nQ: รวมอาหารเช้ามั้ย?\nA: ไม่รวม ถามแนะนำร้านอาหารได้ที่แผนกต้อนรับ\n\nQ: ขอผ้าเช็ดตัวเพิ่มได้มั้ย?\nA: ได้เลย มีที่แผนกต้อนรับ`,
+      survey: `เราอยากฟังความคิดเห็นเกี่ยวกับการเข้าพักของคุณ!\nข้อเสนอแนะของคุณช่วยให้เราพัฒนาได้ดีขึ้น\n\nกรอกแบบสอบถามสั้นๆ ของเราได้ที่:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nขอบคุณที่เลือกพักที่ Niece Hostel! 🌿`
+    },
+    zh: {
+      smoking: `所有房间严禁吸烟，包括香烟、电子烟及所有吸烟装置。\n如在房间内发现吸烟证据，将收取30,000日元特别清洁费。\n楼外设有指定吸烟区。`,
+      wifi: `网络名称：NIECE_HOSTEL_GUEST\n密码：nicestay2024\n整个旅舍提供免费Wi-Fi。\n如有连接问题，请拨打内线1联系前台。`,
+      cleaning: `ECO服务（适用所有住客）：仅换毛巾+收垃圾，不进入房间。下午1点前将用过的毛巾放入门外红色环保袋，新毛巾将放入蓝色环保袋。\n\n入住2-3晚：不提供常规客房清洁。如需清洁，请在下午1点前将"请打扫"磁贴放在门上。\n\n入住4晚及以上：每3天进行一次全面清洁，其余为ECO服务。`,
+      hotel: `退房时间：上午11:00\n逾时退房：11:00后每小时1,000日元\n请将房卡归还至1楼回收箱\n\n便利设施：1楼大堂免费提供牙刷等洗漱用品\n\n公共设施（2楼）：微波炉、自动贩卖机和投币洗衣机\n\n冰块：无制冰机，请向前台索取\n\n入口：凌晨0点至5点锁闭，使用房卡感应右侧传感器`,
+      aircon: `每间客房均配有独立空调和遥控器。\n可按个人喜好调节温度。\n外出时请关闭空调节约能源。\n如有问题，请拨打内线1联系前台。`,
+      luggage: `行李寄存服务仅限入住及退房当日。\n不接受超过一天的寄存。\n请向前台申请，免费提供。`,
+      extra: `逾时退房（11:00后每小时）：1,000日元\n吸烟违规（特别清洁费）：30,000日元\n房卡遗失：请询问前台\n房间损坏：按实际费用收取\n\n所有费用将从存档信用卡扣除或于退房时结算。`,
+      faq: `Q：几点可以入住？\nA：下午3点起办理入住。如需提前入住，请咨询前台。\n\nQ：有宵禁吗？\nA：没有宵禁，但入口从凌晨0点至5点上锁，使用房卡即可进入。\n\nQ：附近有便利店吗？\nA：步行约2分钟处有便利店。\n\nQ：含早餐吗？\nA：不含。如需餐厅推荐，请咨询前台。\n\nQ：可以要更多毛巾吗？\nA：可以！前台备有额外毛巾。`,
+      survey: `我们非常希望了解您的入住体验！\n您的反馈将帮助我们持续改进。\n\n请填写我们的简短问卷：\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\n感谢您选择Niece Hostel！🌿`
+    },
+    ru: {
+      smoking: `Курение строго запрещено во всех номерах, включая сигареты, электронные сигареты и вейпы.\nПри обнаружении следов курения взимается специальный сбор за уборку — 30 000 иен.\nОбозначенные места для курения находятся снаружи здания.`,
+      wifi: `Название сети: NIECE_HOSTEL_GUEST\nПароль: nicestay2024\nБесплатный Wi-Fi доступен по всему хостелу.\nПри проблемах с подключением звоните на ресепшн — добавочный номер 1.`,
+      cleaning: `ЭКО-сервис (для всех гостей): только смена полотенец и вывоз мусора, без входа в номер. До 13:00 оставьте использованные полотенца в красном эко-пакете у двери. Свежие полотенца будут в синем эко-пакете.\n\nПроживание 2–3 ночи: стандартная уборка не предусмотрена. Для заказа уборки повесьте магнит «Please Clean» до 13:00.\n\nПроживание от 4 ночей: полная уборка каждые 3 дня, остальные дни — ЭКО-сервис.`,
+      hotel: `Выезд: 11:00\nПоздний выезд: 1 000 иен в час после 11:00\nСдайте ключ-карту в ящик на 1-м этаже\n\nПринадлежности: бесплатно в холле 1-го этажа\n\nУдобства (2-й этаж): микроволновая печь, торговый автомат, монетная прачечная\n\nЛёд: льдогенератора нет — обратитесь на ресепшн\n\nВход: закрыт с 00:00 до 05:00. Прислоните ключ-карту к датчику справа от входа.`,
+      aircon: `В каждом номере индивидуальный кондиционер с пультом управления.\nНастройте удобную для вас температуру.\nПожалуйста, выключайте кондиционер при выходе из номера.\nПри неисправности звоните на ресепшн — добавочный номер 1.`,
+      luggage: `Хранение багажа доступно только в день заезда и выезда.\nХранение более одного дня невозможно.\nОбратитесь на ресепшн — услуга бесплатная.`,
+      extra: `Поздний выезд (после 11:00): 1 000 иен в час\nНарушение запрета курения (уборка): 30 000 иен\nУтеря ключ-карты: уточните на ресепшн\nПовреждение номера: по фактической стоимости\n\nВсе сборы списываются с карты на файле или оплачиваются при выезде.`,
+      faq: `Q: Во сколько заезд?\nA: Заезд с 15:00. Ранний заезд возможен — уточните на ресепшн.\n\nQ: Есть ли комендантский час?\nA: Нет, но вход закрыт с 00:00 до 05:00. Используйте ключ-карту.\n\nQ: Где ближайший магазин?\nA: Круглосуточный магазин в 2 минутах ходьбы.\n\nQ: Завтрак включён?\nA: Нет. Рекомендации ресторанов — на ресепшн.\n\nQ: Можно ли получить дополнительные полотенца?\nA: Да! Обратитесь на ресепшн.`,
+      survey: `Мы будем рады узнать о вашем пребывании!\nВаши отзывы помогают нам становиться лучше.\n\nЗаполните короткую анкету:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nСпасибо, что выбрали Niece Hostel! 🌿`
+    }
+  }
+};
+
+/* ─── DEFAULT SECTIONS ─── */
+const DEFAULT_SECTIONS = [
+  { id:'smoking',  icon:'🚭', builtin:true },
+  { id:'wifi',     icon:'📶', builtin:true },
+  { id:'cleaning', icon:'🧹', builtin:true },
+  { id:'hotel',    icon:'🏨', builtin:true },
+  { id:'aircon',   icon:'❄️', builtin:true },
+  { id:'luggage',  icon:'🧳', builtin:true },
+  { id:'extra',    icon:'💳', builtin:true },
+  { id:'faq',      icon:'❓', builtin:true },
+  { id:'survey',   icon:'📝', builtin:true },
+];
+const ICON_POOL = ['🚭','📶','🧹','🏨','❄️','🧳','💳','❓','📝','📌','🛎','🗝','🍜','🚿','🛏','🚌','🗺','💡','⚠️','📞','🌐','🅿️','🧴','🏊','🍳','🔑','🚪','🛁','📋','ℹ️'];
+
+/* ─── STATE ─── */
+let currentLang      = 'en';
+let adminSecCurrent  = 'smoking';
+let adminLangCurrent = 'en';
+let secEditLang      = 'en';   // language active in section name editor
+let loginAttempts    = 0;
+let lockoutTimer     = null;
+let editDraft        = {};
+let newSecIcon       = '📌';
+
+/* ─── STORAGE HELPERS ─── */
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+};
+
+function getPin()     { return localStorage.getItem('niece_pin')     || '999999'; }
+function getProfile() { return localStorage.getItem('niece_profile') || 'eve.bp'; }
+function deepCopy(o)  { return JSON.parse(JSON.stringify(o)); }
+
+function getContent() {
+  const saved = LS.get('niece_content');
+  if (!saved) return deepCopy(DEFAULTS.content);
+  const merged = deepCopy(DEFAULTS.content);
+  ['en','th','zh','ru'].forEach(l => {
+    if (saved[l]) Object.assign(merged[l], saved[l]);
+  });
+  return merged;
+}
+
+function getSections() {
+  const saved = LS.get('niece_sections');
+  if (!saved) return DEFAULT_SECTIONS.map(s => ({ ...s, visible:true }));
+  // merge: ensure built-ins still present if not in saved list
+  const savedIds = saved.map(s => s.id);
+  const missing = DEFAULT_SECTIONS.filter(d => !savedIds.includes(d.id))
+    .map(s => ({ ...s, visible:true }));
+  return [...saved, ...missing.filter(s => !saved.find(ss => ss.id===s.id))];
+}
+function saveSections(secs) { LS.set('niece_sections', secs); }
+
+function getLabels() {
+  const saved  = LS.get('niece_labels');
+  const merged = deepCopy(DEFAULTS.labels);
+  if (saved) ['en','th','zh','ru'].forEach(l => {
+    if (saved[l]) Object.assign(merged[l], saved[l]);
+  });
+  return merged;
+}
+function saveLabels(labels) { LS.set('niece_labels', labels); }
+
+let CONTENT  = getContent();
+let SECTIONS = getSections();
+let LABELS   = getLabels();
+
+/* ─── BUILD ACCORDION DYNAMICALLY ─── */
+function buildAccordion() {
+  const acc = document.getElementById('accordion');
+  acc.innerHTML = SECTIONS
+    .filter(s => s.visible !== false)
+    .map(s => `
+      <div class="acc-item" data-sec="${s.id}" id="sec-${s.id}">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span class="ico">${s.icon || '📌'}</span>
+          <span class="lbl"></span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="acc-body" id="body-${s.id}"></div>
+      </div>`).join('');
+}
+
+/* ─── RENDER PAGE ─── */
+function renderAll() {
+  const L       = currentLang;
+  const labels  = LABELS[L] || DEFAULTS.labels[L] || {};
+  const content = CONTENT[L] || {};
+
+  // Rebuild accordion structure (sections may have changed)
+  buildAccordion();
+
+  // Fill labels
+  SECTIONS.filter(s => s.visible !== false).forEach(s => {
+    const el = document.querySelector(`#sec-${s.id} .lbl`);
+    if (el) el.textContent = labels[s.id] || s.id;
+  });
+
+  // Fill bodies
+  SECTIONS.forEach(s => {
+    const el = document.getElementById('body-' + s.id);
+    if (!el) return;
+    const text = content[s.id] || '';
+    if (s.id === 'faq')    { el.innerHTML = renderFAQ(text); }
+    else if (s.id === 'survey') { el.innerHTML = renderSurvey(text); }
+    else { el.innerHTML = renderText(text); }
+  });
+
+  // Smoking banner — show ALL lines
+  const sbEl = document.getElementById('sb-content');
+  if (sbEl) {
+    sbEl.innerHTML = (content.smoking || '')
+      .split('\n').filter(l => l.trim())
+      .map(l => `<p>${l}</p>`).join('');
+  }
+
+  // Re-run search if active
+  const q = document.getElementById('searchInput').value.trim();
+  if (q) doSearch(q);
+}
+
+function renderText(raw) {
+  if (!raw) return '';
+  return raw.split('\n').filter(l => l.trim()).map(l => {
+    if (l.startsWith('http')) return `<p><a href="${l.trim()}" target="_blank" style="color:var(--green2);word-break:break-all;">${l.trim()}</a></p>`;
+    return `<p>${l}</p>`;
+  }).join('');
+}
+
+function renderFAQ(raw) {
+  if (!raw) return '';
+  // parse Q: / A: pairs
+  const pairs = [];
+  const lines = raw.split('\n');
+  let cur = null;
+  lines.forEach(l => {
+    if (l.startsWith('Q:') || l.startsWith('Q：')) {
+      if (cur) pairs.push(cur);
+      cur = { q: l.replace(/^Q[：:]/, '').trim(), a: '' };
+    } else if ((l.startsWith('A:') || l.startsWith('A：')) && cur) {
+      cur.a = l.replace(/^A[：:]/, '').trim();
+    } else if (cur && cur.a && l.trim()) {
+      cur.a += ' ' + l.trim();
+    }
+  });
+  if (cur) pairs.push(cur);
+
+  if (!pairs.length) return renderText(raw);
+  return `<ul class="faq-list">${pairs.map((p,i) => `
+    <li class="faq-item" id="faq-${i}">
+      <div class="faq-q" onclick="toggleFAQ(${i})">
+        <span class="fq">${p.q}</span>
+        <span class="fc">▼</span>
+      </div>
+      <div class="faq-a">${p.a}</div>
+    </li>`).join('')}</ul>`;
+}
+
+function renderSurvey(raw) {
+  if (!raw) return '';
+  let html = '';
+  raw.split('\n').filter(l=>l.trim()).forEach(l => {
+    if (l.startsWith('http')) {
+      html += `<div style="text-align:center;margin:14px 0;">
+        <a href="${l.trim()}" target="_blank" style="
+          display:inline-block;background:var(--green);color:#fff;
+          padding:12px 28px;border-radius:99px;text-decoration:none;
+          font-weight:700;font-size:.9rem;">Fill out form →</a></div>`;
+    } else {
+      html += `<p>${l}</p>`;
+    }
+  });
+  return html;
+}
+
+function toggleFAQ(i) {
+  const el = document.getElementById('faq-' + i);
+  if (el) el.classList.toggle('open');
+}
+
+/* ─── LANGUAGE ─── */
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAll();
+}
+
+/* ─── ACCORDION ─── */
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+/* ─── SEARCH ─── */
+function doSearch(q) {
+  const clear = document.getElementById('sClear');
+  const hint  = document.getElementById('searchHint');
+  const noRes = document.getElementById('noResult');
+
+  clear.classList.toggle('show', q.length > 0);
+
+  if (!q.trim()) {
+    document.querySelectorAll('.acc-item').forEach(el => {
+      el.classList.remove('search-hidden','search-match');
+    });
+    hint.textContent = '';
+    noRes.classList.remove('show');
+    return;
+  }
+
+  const term = q.toLowerCase();
+  const labels = DEFAULTS.labels[currentLang];
+  const content = CONTENT[currentLang];
+  let matchCount = 0;
+
+  document.querySelectorAll('.acc-item').forEach(el => {
+    const sec = el.getAttribute('data-sec');
+    const labelText = (labels[sec] || '').toLowerCase();
+    const bodyText  = (content[sec] || '').toLowerCase();
+    const found = labelText.includes(term) || bodyText.includes(term);
+    el.classList.toggle('search-hidden', !found);
+    el.classList.toggle('search-match', found);
+    if (found) {
+      matchCount++;
+      el.classList.add('open');
+    } else {
+      el.classList.remove('open');
+    }
+  });
+
+  hint.textContent = matchCount ? `${matchCount} section(s) found` : '';
+  noRes.classList.toggle('show', matchCount === 0);
+}
+
+function clearSearch() {
+  const inp = document.getElementById('searchInput');
+  inp.value = '';
+  doSearch('');
+  inp.focus();
+}
+
+/* ─── LOGIN ─── */
+function openLoginModal() {
+  document.getElementById('loginOverlay').classList.add('show');
+  document.getElementById('profileInput').value = '';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('lockoutMsg').classList.remove('show');
+  document.getElementById('loginForm').style.display = '';
+  setTimeout(() => document.getElementById('profileInput').focus(), 100);
+}
+function closeLoginModal() {
+  document.getElementById('loginOverlay').classList.remove('show');
+}
+
+function doLogin() {
+  if (lockoutTimer) return;
+
+  const pin   = document.getElementById('pinInput').value.trim();
+  const errEl = document.getElementById('loginError');
+
+  if (!pin) { showLoginErr('Please enter your PIN.'); return; }
+
+  if (pin === getPin()) {
+    loginAttempts = 0;
+    closeLoginModal();
+    openAdminPanel();
+  } else {
+    loginAttempts++;
+    const remaining = 3 - loginAttempts;
+    if (loginAttempts >= 3) {
+      startLockout();
+    } else {
+      showLoginErr(`Incorrect PIN. ${remaining} attempt(s) left.`);
+      document.getElementById('pinInput').value = '';
+    }
+  }
+}
+
+function showLoginErr(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function startLockout() {
+  const errEl    = document.getElementById('loginError');
+  const lockEl   = document.getElementById('lockoutMsg');
+  const formEl   = document.getElementById('loginForm');
+  errEl.classList.remove('show');
+  lockEl.classList.add('show');
+  formEl.style.display = 'none';
+  let secs = 30;
+  lockEl.textContent = `Too many attempts. Please wait ${secs}s before trying again.`;
+  lockoutTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(lockoutTimer);
+      lockoutTimer = null;
+      loginAttempts = 0;
+      lockEl.classList.remove('show');
+      formEl.style.display = '';
+      document.getElementById('pinInput').value = '';
+    } else {
+      lockEl.textContent = `Too many attempts. Please wait ${secs}s before trying again.`;
+    }
+  }, 1000);
+}
+
+/* ─── FORGOT PIN ─── */
+function showForgot() {
+  closeLoginModal();
+  document.getElementById('forgotOverlay').classList.add('show');
+}
+function closeForgot() {
+  document.getElementById('forgotOverlay').classList.remove('show');
+  openLoginModal();
+}
+function sendPinEmail() {
+  const pin     = getPin();
+  const profile = getProfile();
+  const subj    = encodeURIComponent('Niece Hostel — PIN Recovery');
+  const body    = encodeURIComponent(
+    `Hello,\n\nYour Niece Hostel admin PIN is:\n\n  PIN: ${pin}\n  Profile: ${profile}\n\n(Niece Hostel Admin System)`
+  );
+  window.location.href = `mailto:bzaataan@gmail.com?subject=${subj}&body=${body}`;
+  document.getElementById('forgotOverlay').classList.remove('show');
+  showToast('📧 Email app opened!');
+}
+
+/* ─── ADMIN PANEL ─── */
+function buildAdminTabs() {
+  const tabs = document.getElementById('adminSecTabs');
+  const secs = SECTIONS; // show all sections including hidden ones
+  tabs.innerHTML = secs.map((s, i) => {
+    const label = (LABELS[adminLangCurrent] || DEFAULTS.labels[adminLangCurrent] || {})[s.id] || s.id;
+    const shortLabel = label.length > 10 ? label.substring(0,9)+'…' : label;
+    const hidden = s.visible === false ? ' style="opacity:.45"' : '';
+    return `<div class="sec-tab${i===0?' active':''}" onclick="selectAdminSec('${s.id}',this)"${hidden}>${s.icon} ${shortLabel}</div>`;
+  }).join('') +
+  `<div class="sec-tab" onclick="selectAdminSec('__sections',this)">📋 Sections</div>`;
+}
+
+function openAdminPanel() {
+  SECTIONS = getSections();
+  LABELS   = getLabels();
+  editDraft = deepCopy(CONTENT);
+  document.getElementById('adminProfileName').textContent = getProfile();
+  buildAdminTabs();
+  document.getElementById('adminPanel').classList.add('show');
+  selectAdminSec(SECTIONS[0]?.id || 'smoking', document.querySelector('.sec-tab'));
+}
+function doLogout() {
+  document.getElementById('adminPanel').classList.remove('show');
+  showToast('Logged out');
+}
+
+function selectAdminSec(sec, tabEl) {
+  adminSecCurrent = sec;
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  const langRow = document.getElementById('adminLangRow');
+  langRow.style.display = (sec === '__settings' || sec === '__sections') ? 'none' : '';
+  renderAdminEditor();
+}
+
+/* ─── SECTIONS MANAGER ─── */
+function renderSectionsManager() {
+  const ed = document.getElementById('adminEditor');
+  const secs = SECTIONS;
+  ed.innerHTML = `
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px;">
+      แก้ชื่อหัวข้อ, เปิด/ซ่อน, เพิ่มหัวข้อใหม่, เรียงลำดับ
+    </p>
+    <div class="sec-lang-tabs" id="secLangTabs">
+      ${['en','th','zh','ru'].map(l=>`<button class="sec-lang-tab${l===secEditLang?' active':''}" onclick="setSecEditLang('${l}',this)">${l.toUpperCase()}</button>`).join('')}
+    </div>
+    ${secs.map((s,i) => {
+      const lbl = (LABELS[secEditLang]||{})[s.id] || (DEFAULTS.labels[secEditLang]||{})[s.id] || '';
+      return `<div class="sec-row" id="secrow-${s.id}">
+        <div class="sec-move">
+          <button onclick="moveSec('${s.id}',-1)">▲</button>
+          <button onclick="moveSec('${s.id}',1)">▼</button>
+        </div>
+        <div class="sec-icon">${s.icon}</div>
+        <div class="sec-name">
+          <input type="text" value="${lbl}" placeholder="Section name (${secEditLang.toUpperCase()})"
+            onchange="updateSecLabel('${s.id}','${secEditLang}',this.value)" />
+        </div>
+        <span class="sec-vis${s.visible!==false?' on':''}" onclick="toggleSecVis('${s.id}')" title="${s.visible!==false?'Visible (click to hide)':'Hidden (click to show)'}">
+          ${s.visible!==false?'👁':'🙈'}
+        </span>
+        ${!s.builtin ? `<span class="sec-del" onclick="deleteSec('${s.id}')" title="Delete section">🗑</span>` : ''}
+      </div>`;
+    }).join('')}
+    <button class="btn-add-sec" onclick="toggleNewSecForm()">➕ Add new section</button>
+    <div class="new-sec-form" id="newSecForm">
+      <div class="sec-lang-tabs" id="newSecLangTabs">
+        ${['en','th','zh','ru'].map(l=>`<button class="sec-lang-tab${l==='en'?' active':''}" onclick="setNewSecLang('${l}',this)">${l.toUpperCase()}</button>`).join('')}
+      </div>
+      <input type="text" id="newSecNameEn" placeholder="Section name (EN)" />
+      <input type="text" id="newSecNameTh" placeholder="Section name (TH)" style="display:none" />
+      <input type="text" id="newSecNameZh" placeholder="Section name (ZH)" style="display:none" />
+      <input type="text" id="newSecNameRu" placeholder="Section name (RU)" style="display:none" />
+      <div style="font-size:.72rem;color:var(--muted);margin:4px 0 8px">Pick icon:</div>
+      <div class="icon-picker">
+        ${ICON_POOL.map(ic=>`<span class="icon-opt${ic===newSecIcon?' selected':''}" onclick="pickIcon('${ic}',this)">${ic}</span>`).join('')}
+      </div>
+      <button class="btn-create" onclick="createNewSec()">✅ Create Section</button>
+    </div>`;
+}
+
+function setSecEditLang(lang, btn) {
+  secEditLang = lang;
+  document.querySelectorAll('#secLangTabs .sec-lang-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderSectionsManager();
+}
+function setNewSecLang(lang, btn) {
+  document.querySelectorAll('#newSecLangTabs .sec-lang-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  ['en','th','zh','ru'].forEach(l => {
+    const el = document.getElementById('newSecName'+l.charAt(0).toUpperCase()+l.slice(1));
+    if(el) el.style.display = l===lang ? '' : 'none';
+  });
+}
+function pickIcon(ic, el) {
+  newSecIcon = ic;
+  document.querySelectorAll('.icon-opt').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleNewSecForm() {
+  const f = document.getElementById('newSecForm');
+  f.classList.toggle('show');
+}
+function updateSecLabel(id, lang, val) {
+  if (!LABELS[lang]) LABELS[lang] = {};
+  LABELS[lang][id] = val;
+}
+function toggleSecVis(id) {
+  const s = SECTIONS.find(s=>s.id===id);
+  if (s) s.visible = s.visible === false ? true : false;
+  renderSectionsManager();
+}
+function moveSec(id, dir) {
+  const idx = SECTIONS.findIndex(s=>s.id===id);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= SECTIONS.length) return;
+  [SECTIONS[idx], SECTIONS[newIdx]] = [SECTIONS[newIdx], SECTIONS[idx]];
+  renderSectionsManager();
+}
+function deleteSec(id) {
+  if (!confirm('Delete this section? Its content will also be removed.')) return;
+  SECTIONS = SECTIONS.filter(s=>s.id!==id);
+  ['en','th','zh','ru'].forEach(l => { if(editDraft[l]) delete editDraft[l][id]; if(LABELS[l]) delete LABELS[l][id]; });
+  renderSectionsManager();
+  buildAdminTabs();
+}
+function createNewSec() {
+  const names = { en: document.getElementById('newSecNameEn')?.value.trim() || '' };
+  ['th','zh','ru'].forEach(l => { names[l] = document.getElementById('newSecName'+l.charAt(0).toUpperCase()+l.slice(1))?.value.trim() || names.en; });
+  if (!names.en) { alert('Please enter a section name (EN) at minimum.'); return; }
+  const id = 'sec_' + Date.now();
+  SECTIONS.push({ id, icon: newSecIcon, visible: true, builtin: false });
+  ['en','th','zh','ru'].forEach(l => {
+    if (!LABELS[l]) LABELS[l] = {};
+    LABELS[l][id] = names[l];
+    if (!editDraft[l]) editDraft[l] = {};
+    editDraft[l][id] = '';
+  });
+  newSecIcon = '📌';
+  buildAdminTabs();
+  renderSectionsManager();
+  showToast('✅ Section added!');
+}
+
+function selectAdminLang(lang, btn) {
+  adminLangCurrent = lang;
+  document.querySelectorAll('.admin-lang-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAdminEditor();
+}
+
+function renderAdminEditor() {
+  if (adminSecCurrent === '__sections') { renderSectionsManager(); return; }
+  const ed = document.getElementById('adminEditor');
+
+  const lang = adminLangCurrent;
+  const sec  = adminSecCurrent;
+  const val  = (editDraft[lang] && editDraft[lang][sec]) || '';
+  const isFAQ = sec === 'faq';
+
+  ed.innerHTML = `
+    ${isFAQ ? `<div class="faq-editor-hint">Format: start each question with <strong>Q:</strong> and answer with <strong>A:</strong> — one pair per blank line.<br>Example:<br>Q: What time is check-in?<br>A: From 3:00 PM.</div>` : ''}
+    <label>Section: <strong>${DEFAULTS.labels.en[sec] || sec}</strong> — Language: <strong>${lang.toUpperCase()}</strong></label>
+    <textarea id="adminTA" oninput="onDraftInput()">${escapeHTML(val)}</textarea>
+    <div class="editor-hint">Each line becomes a paragraph on the page. Save when done.</div>`;
+}
+
+function escapeHTML(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function onDraftInput() {
+  const ta = document.getElementById('adminTA');
+  if (!ta) return;
+  if (!editDraft[adminLangCurrent]) editDraft[adminLangCurrent] = {};
+  editDraft[adminLangCurrent][adminSecCurrent] = ta.value;
+}
+
+function saveAllContent() {
+  // capture whatever is currently in the textarea before saving
+  const ta = document.getElementById('adminTA');
+  if (ta && adminSecCurrent !== '__settings') {
+    if (!editDraft[adminLangCurrent]) editDraft[adminLangCurrent] = {};
+    editDraft[adminLangCurrent][adminSecCurrent] = ta.value;
+  }
+  CONTENT  = deepCopy(editDraft);
+  LS.set('niece_content', CONTENT);
+  saveSections(SECTIONS);
+  saveLabels(LABELS);
+  LABELS   = getLabels();
+  SECTIONS = getSections();
+  renderAll();
+  const savedSec = adminSecCurrent;
+  showToast('✅ Saved!');
+  setTimeout(() => {
+    document.getElementById('adminPanel').classList.remove('show');
+    // open & scroll to the edited section so changes are visible
+    if (savedSec && savedSec !== '__settings') {
+      const item = document.getElementById('sec-' + savedSec);
+      if (item) {
+        document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('open'));
+        item.classList.add('open');
+        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      }
+    }
+  }, 700);
+}
+
+function openSettings() {
+  document.getElementById('curProfileLabel').textContent = `(current: ${getProfile()})`;
+  document.getElementById('newProfile').value = '';
+  document.getElementById('newPin1').value = '';
+  document.getElementById('newPin2').value = '';
+  document.getElementById('settingsMsg').classList.remove('show');
+  document.getElementById('settingsOverlay').classList.add('show');
+}
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+function updateSettings() {
+  const np  = document.getElementById('newProfile').value.trim();
+  const p1  = document.getElementById('newPin1').value.trim();
+  const p2  = document.getElementById('newPin2').value.trim();
+  const msg = document.getElementById('settingsMsg');
+  msg.classList.remove('show');
+  msg.style.color = '';
+
+  if (p1 && p1 !== p2) {
+    msg.textContent = '❌ PINs do not match.';
+    msg.style.color = 'var(--red)';
+    msg.classList.add('show');
+    return;
+  }
+  if (p1 && !/^\d+$/.test(p1)) {
+    msg.textContent = '❌ PIN must be numbers only.';
+    msg.style.color = 'var(--red)';
+    msg.classList.add('show');
+    return;
+  }
+  if (np) localStorage.setItem('niece_profile', np);
+  if (p1) localStorage.setItem('niece_pin', p1);
+  document.getElementById('adminProfileName').textContent = getProfile();
+  document.getElementById('curProfileLabel').textContent = `(current: ${getProfile()})`;
+  msg.textContent = '✅ Settings updated!';
+  msg.style.color = 'var(--green)';
+  msg.classList.add('show');
+  document.getElementById('newProfile').value = '';
+  document.getElementById('newPin1').value = '';
+  document.getElementById('newPin2').value = '';
+}
+
+/* ─── TOAST ─── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* ─── INIT ─── */
+renderAll();
+
+</script>
+</body>
+</html>
