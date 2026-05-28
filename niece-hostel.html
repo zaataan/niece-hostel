@@ -30,12 +30,13 @@
     .header-logo-fallback .logo-sub  { font-size: 0.75rem; color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-top: 3px; }
     .header-tagline { font-size: 0.78rem; color: rgba(255,255,255,0.55); letter-spacing: 1px; margin-top: 8px; }
 
-    /* ── NO SMOKING BANNER ── */
-    .smoke-banner { margin: 14px 14px 0; background: var(--white); border: 2px solid var(--red); border-radius: 14px; padding: 16px 14px; text-align: center; }
-    .smoke-banner .icon { font-size: 2.4rem; }
-    .smoke-banner #sb-content p { font-size: 0.88rem; line-height: 1.6; margin: 4px 0; color: var(--text); }
-    .smoke-banner #sb-content p:first-child { font-weight: 700; font-size: 0.92rem; margin-top: 6px; }
-    .smoke-banner #sb-content p:nth-child(2) { font-weight: 800; font-size: 0.95rem; color: var(--red); }
+    /* ── WELCOME BANNER ── */
+    .welcome-banner { margin: 14px 14px 0; background: var(--green); border-radius: 14px; padding: 20px 16px 18px; text-align: center; }
+    .welcome-banner .wb-top { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+    .welcome-banner .wb-icon { font-size: 1.5rem; }
+    .welcome-banner .wb-title { font-size: 1.05rem; font-weight: 800; color: var(--white); }
+    .welcome-banner #wb-content p { font-size: 0.83rem; line-height: 1.65; color: rgba(255,255,255,0.82); margin: 3px 0; }
+    .welcome-banner #wb-content a { color: var(--yellow); text-decoration: none; font-weight: 700; }
 
     /* ── SEARCH BAR ── */
     .search-wrap { padding: 12px 14px 0; position: relative; }
@@ -209,7 +210,26 @@
     .forgot-modal .email-pill { background: #f0f8f5; color: var(--green); border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: 0.88rem; margin-bottom: 20px; display: inline-block; }
     .forgot-modal .btn-send { background: var(--green); color: var(--white); border: none; border-radius: 12px; padding: 13px; width: 100%; font-size: 0.92rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
     .forgot-modal .btn-back { background: none; border: 1.5px solid var(--border); border-radius: 12px; padding: 11px; width: 100%; font-size: 0.88rem; cursor: pointer; color: var(--muted); }
+  /* ── WIFI QR ── */
+  .wifi-qr-wrap { display: flex; gap: 14px; margin: 14px 0; flex-wrap: wrap; justify-content: center; }
+  .wifi-qr-card { flex: 0 0 auto; width: 148px; background: #f0f8f5; border: 1.5px solid var(--green2); border-radius: 14px; padding: 14px 10px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+  .wifi-qr-card:active { transform: scale(0.97); }
+  .wifi-qr-card canvas { border-radius: 8px; display: block; pointer-events: none; }
+  .wifi-qr-label { font-size: 0.75rem; font-weight: 700; color: var(--green); margin-top: 8px; word-break: break-all; }
+  .wifi-qr-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .wifi-tap-hint { font-size: 0.7rem; color: var(--green2); margin-top: 5px; }
+  /* QR fullscreen modal */
+  .qr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; padding: 24px; }
+  .qr-modal.show { display: flex; }
+  .qr-modal-card { background: var(--white); border-radius: 20px; padding: 28px 24px 20px; text-align: center; max-width: 300px; width: 100%; }
+  .qr-modal-card canvas { border-radius: 10px; }
+  .qr-modal-ssid { font-size: 1rem; font-weight: 800; color: var(--green); margin: 12px 0 4px; }
+  .qr-modal-hint { font-size: 0.78rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .qr-modal-pass { background: #f0f8f5; border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; font-weight: 700; color: var(--green); letter-spacing: 1px; margin-bottom: 12px; word-break: break-all; }
+  .btn-copy-pass { width: 100%; background: var(--green); color: var(--white); border: none; border-radius: 12px; padding: 12px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+  .btn-close-qr { width: 100%; background: none; border: 1.5px solid var(--border); border-radius: 12px; padding: 10px; font-size: 0.88rem; cursor: pointer; color: var(--muted); }
   </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -223,11 +243,15 @@
   <div class="header-tagline" id="header-tagline">Welcome — we're glad you're here 🌿</div>
 </div>
 
-<!-- ═══ NO SMOKING BANNER ═══ -->
-<div class="smoke-banner">
-  <div class="icon">🚭</div>
-  <div id="sb-content"></div>
+<!-- ═══ WELCOME BANNER ═══ -->
+<div class="welcome-banner">
+  <div class="wb-top">
+    <span class="wb-icon">🌿</span>
+    <span class="wb-title" id="wb-title">Welcome to Niece Hostel</span>
+  </div>
+  <div id="wb-content"></div>
 </div>
+
 
 <!-- ═══ SEARCH BAR ═══ -->
 <div class="search-wrap">
@@ -254,7 +278,7 @@
 </div>
 
 <!-- ═══ FOOTER ═══ -->
-<footer><span>NIECE HOSTEL</span> — Front Desk: Extension 1</footer>
+<footer><span>NIECE HOSTEL</span> — Contact: <span>+66625469878</span> · 10AM–10PM</footer>
 
 <!-- ═══ ADMIN TRIGGER ═══ -->
 <button id="adminTrigger" onclick="openLoginModal()" title="Owner">⚙</button>
@@ -291,6 +315,18 @@
     <div class="email-pill">bzaataan@gmail.com</div>
     <button class="btn-send" onclick="sendPinEmail()">Open Email App →</button>
     <button class="btn-back" onclick="closeForgot()">← Back to Login</button>
+  </div>
+</div>
+
+<!-- ═══ WIFI QR MODAL ═══ -->
+<div class="qr-modal" id="qrModal" onclick="closeQrModal()">
+  <div class="qr-modal-card" onclick="event.stopPropagation()">
+    <div id="qrModalCanvas"></div>
+    <div class="qr-modal-ssid" id="qrModalSSID"></div>
+    <div class="qr-modal-hint">📷 Open your Camera app and point it at the QR code — tap the notification to connect!</div>
+    <div class="qr-modal-pass" id="qrModalPass"></div>
+    <button class="btn-copy-pass" onclick="copyWifiPass()">📋 Copy Password</button>
+    <button class="btn-close-qr" onclick="closeQrModal()">✕ Close</button>
   </div>
 </div>
 
@@ -356,76 +392,154 @@
    ───────────────────────────────────────── */
 const DEFAULTS = {
   labels: {
-    en: { smoking:'No Smoking Policy', wifi:'Wi-Fi Information', cleaning:'Room Cleaning Service', hotel:'Hotel Information', aircon:'Air Conditioner', luggage:'Luggage Storage', extra:'Extra Charges', faq:'Common Questions (FAQ)', survey:'Feedback & Questionnaire' },
-    th: { smoking:'นโยบายห้ามสูบบุหรี่', wifi:'ข้อมูล Wi-Fi', cleaning:'บริการทำความสะอาด', hotel:'ข้อมูลโรงแรม', aircon:'เครื่องปรับอากาศ', luggage:'บริการฝากกระเป๋า', extra:'ค่าใช้จ่ายเพิ่มเติม', faq:'คำถามที่พบบ่อย', survey:'แบบสอบถาม' },
-    zh: { smoking:'禁烟政策', wifi:'Wi-Fi信息', cleaning:'客房清洁服务', hotel:'酒店信息', aircon:'空调信息', luggage:'行李寄存', extra:'额外费用', faq:'常见问题 FAQ', survey:'反馈问卷' },
-    ru: { smoking:'Запрет курения', wifi:'Информация о Wi-Fi', cleaning:'Уборка номера', hotel:'Информация об отеле', aircon:'Кондиционер', luggage:'Хранение багажа', extra:'Дополнительные сборы', faq:'Частые вопросы FAQ', survey:'Обратная связь' }
+    en: {
+      hotel:'Welcome to Niece Hostel', smoking:'No Smoking Policy', checkin:'Check-in & Check-out',
+      rules:'House Rules', wifi:'Wi-Fi & Connect', cleaning:'Room Cleaning',
+      aircon:'Air Conditioner', luggage:'Luggage Storage', facilities:'Facilities & Amenities',
+      transport:'Transportation', activities:'Activities & Tours', extra:'Extra Charges',
+      contact:'Contact & Support', faq:'Common Questions (FAQ)', survey:'Feedback & Survey'
+    },
+    th: {
+      hotel:'ยินดีต้อนรับสู่ Niece Hostel', smoking:'นโยบายห้ามสูบบุหรี่', checkin:'เช็คอิน & เช็คเอาต์',
+      rules:'กฎของโรงแรม', wifi:'Wi-Fi & เชื่อมต่อ', cleaning:'บริการทำความสะอาด',
+      aircon:'เครื่องปรับอากาศ', luggage:'บริการฝากกระเป๋า', facilities:'สิ่งอำนวยความสะดวก',
+      transport:'การเดินทาง', activities:'กิจกรรม & ทัวร์', extra:'ค่าใช้จ่ายเพิ่มเติม',
+      contact:'ติดต่อ & ช่วยเหลือ', faq:'คำถามที่พบบ่อย', survey:'แบบประเมิน'
+    },
+    zh: {
+      hotel:'欢迎来到Niece Hostel', smoking:'禁烟政策', checkin:'入住 & 退房',
+      rules:'住宿规则', wifi:'Wi-Fi & 连接', cleaning:'客房清洁',
+      aircon:'空调使用', luggage:'行李寄存', facilities:'设施与服务',
+      transport:'交通信息', activities:'活动 & 旅游', extra:'额外费用',
+      contact:'联系与支持', faq:'常见问题', survey:'意见反馈'
+    },
+    ru: {
+      hotel:'Добро пожаловать в Niece Hostel', smoking:'Запрет курения', checkin:'Заезд & Выезд',
+      rules:'Правила хостела', wifi:'Wi-Fi & Подключение', cleaning:'Уборка номера',
+      aircon:'Кондиционер', luggage:'Хранение багажа', facilities:'Удобства и услуги',
+      transport:'Транспорт', activities:'Мероприятия & Туры', extra:'Дополнительные расходы',
+      contact:'Контакты & Поддержка', faq:'Частые вопросы', survey:'Обратная связь'
+    }
   },
   content: {
     en: {
-      smoking: `All rooms are designated non-smoking — including cigarettes, e-cigarettes, and all vaping devices.\nIf evidence of smoking is found in your room, a special cleaning fee of 30,000 YEN will be charged.\nDesignated smoking areas are available outside the building.`,
-      wifi: `Network name: NIECE_HOSTEL_GUEST\nPassword: nicestay2024\nFree Wi-Fi is available throughout the hostel.\nFor connection issues, please contact the front desk at Extension 1.`,
-      cleaning: `ECO Service (all stays): Towel exchange + trash collection only, no room entry. Place used towels in the RED eco-bag outside your door before 1:00 PM. Fresh towels will be left in the BLUE eco-bag.\n\n2–3 Night Stays: Regular housekeeping is not provided. To request cleaning, place the "Please Clean" magnet on your door by 1:00 PM.\n\n4+ Night Stays: Full cleaning every 3 days. Other days are ECO service days.`,
-      hotel: `Check-out time: 11:00 AM\nLate check-out: 1,000 YEN per hour after 11:00 AM.\nPlease return your key card to the box on the 1st floor.\n\nAmenities: Toothbrushes and toiletries are available free of charge in the 1F lobby.\n\nFacilities (2F): Microwave, vending machine, and coin laundry are on the 2nd floor.\n\nIce: No ice machine — please ask at the front desk.\n\nEntrance: Locked from midnight (00:00) to 05:00. Use your key card on the sensor at the right of the entrance.`,
-      aircon: `Each room has an individual air conditioner and remote control.\nPlease adjust to your preferred temperature.\nRemember to turn off the air conditioner when leaving the room.\nFor any issues, call the front desk at Extension 1.`,
-      luggage: `Luggage storage is available on the day of check-in and check-out only.\nWe are unable to store luggage for more than one day.\nPlease ask at the front desk — storage is free of charge.`,
-      extra: `Late check-out (after 11:00 AM): 1,000 YEN per hour\nSmoking violation (special cleaning): 30,000 YEN\nLost key card: Please ask at front desk\nRoom damage: Assessed at actual replacement cost\n\nAll charges will be billed to the card on file or collected at check-out.`,
-      faq: `Q: What time is check-in?\nA: Check-in is available from 3:00 PM. Early check-in may be available — please ask at the front desk.\n\nQ: Is there a curfew?\nA: No curfew, but the entrance is locked from midnight to 5:00 AM. Use your key card to enter.\n\nQ: Where is the nearest convenience store?\nA: There is a convenience store approximately 2 minutes walk from the hostel.\n\nQ: Is breakfast included?\nA: Breakfast is not included. Please ask the front desk for nearby restaurant recommendations.\n\nQ: Can I get more towels?\nA: Yes! Extra towels are available at the front desk.`,
-      survey: `We would love to hear about your stay!\nYour feedback helps us improve for all guests.\n\nPlease fill out our short questionnaire:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nThank you for choosing Niece Hostel! 🌿`
+      hotel: `Welcome to Niece Hostel! 🌿\nWe're happy to have you here and hope you enjoy your stay.\n\nThere is no staff permanently on-site. However, we are always available through messages.\n📩 Contact Hours: 10:00 AM – 10:00 PM\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram: +66625469878\nEmail: niecehostel@gmail.com\n\n🚨 Emergency (10 PM – 10 AM only): 065-287-4666`,
+      smoking: `🚭 No Smoking — Entire Hostel\n⚠️ Fine: 2,000 THB for indoor smoking (Thai law)\nSmoking area: In front of the building only.\nStrictly prohibited: cigarettes, e-cigarettes, and all vaping devices indoors.`,
+      checkin: `Check-in Time: 2:00 PM (14:00)\nCheck-out Time: 12:00 PM (noon)\n\nExpress Check-out: Available\n\nEarly Check-in: Subject to availability. If the room is still being prepared, you're welcome to leave your bags and wait in the lobby — we'll notify you as soon as it's ready.\n\nLate Check-out: Generally not available as our cleaning follows a fixed schedule. If needed, subject to room availability and charged as a full extra day after 12:00 PM. Please request at least 1 day in advance.\n\nAfter Check-out: You're very welcome to relax and enjoy our facilities — there's no rush to leave!\n\nExtend Your Stay: Please inform us before 10:00 AM on your check-out date (subject to availability).\n\nPayment & Cancellation: Payment must be made before your stay. All sales are final and non-refundable.`,
+      rules: `"If you open it, close it; if you borrow it, return it; if you turn it on, turn it off; if you break it, fix it; if you use it, take care of it; if you make a mess, clean it up; if you move it, put it back."\n\n🌙 Quiet Hours: 10:00 PM – 9:00 AM\n🚬 Smoking: Front of building only. 2,000 THB fine for indoor smoking.\n🍺 Drugs & Firearms: Strictly prohibited on all premises. Drug use = 5,000 THB fine + immediate eviction (no refund).\n👥 Visitors: Non-registered guests are not allowed in hostel restricted areas. Friends may visit in the lobby only.\n🔑 Lost Access Card/Key: 300 THB replacement fee.\n🚪 Room Changes: Do not change rooms without permission. 2,000 THB fee applies.\n💥 Property Damage: Charged at 150% of full replacement value. Criminal charges may apply in extreme cases.\n🛏 Dorm Rules: Do not take bedding from other beds (300 THB fine). Do not change beds. AC is set to 25°C — do not change without all guests agreeing. Avoid strong perfume. Hang wet clothes at the laundry area.\n🔒 Loss or Damage: Niece Hostel is not responsible for loss or damage to guests' belongings. Please use the locker/security box provided in your room.`,
+      wifi: `📶 Wi-Fi Networks\nNIECEHOSTEL_2.4G — better range throughout the hostel\nNIECEHOSTEL_5G — faster speed, best near the router\n\n🔑 Password: YOUWONTGUESSTHISONE357\n\nScan the QR code below to connect instantly — no typing needed!\n\n[WIFI_QR:NIECEHOSTEL_2.4G:YOUWONTGUESSTHISONE357]\n\nFor connection issues, please contact us:\nWhatsApp / Line: +66625469878`,
+      cleaning: `Housekeeping Schedule\nRooms are cleaned every third day of your stay.\nExample: Check-in on the 1st → cleaning on the 3rd → next on the 6th.\n\nFor additional cleaning requests outside the schedule, please message us.`,
+      aircon: `Air Conditioner — Dorm Room Policy\nThe air conditioner is preset to 25°C.\nPlease do not change the temperature unless all guests in the room agree.\n\nIf you feel cold, extra blankets are available — please ask staff.\nDo not take blankets, pillows, or towels from other beds. (300 THB fine)`,
+      luggage: `Luggage Storage\nWe are happy to keep your bags before check-in or after check-out.\n\n⚠️ Important: Please do not store valuables inside your luggage while in storage.\nNiece Hostel is not responsible for loss or damage to valuables.\n\nTo arrange storage, please contact us:\nWhatsApp / Line: +66625469878`,
+      facilities: `🍳 Shared Kitchen\nThe kitchen is fully equipped for guest use.\n• Do NOT leave cooking unattended — 2,000 THB safety fine.\n• Clean up after yourself. Wash all dishes, pots, and pans after use.\n• Do not leave cooked food in pots or pans.\n• Damaged appliances due to misuse will be charged at full replacement cost.\n\n🧺 Laundry Room (1st floor, back of hostel)\nWasher: 30 THB | Dryer: 50 THB | Detergent: 5 THB (Honest Box)\nPayment: 10 THB coins only.\n\nHow to use the Washer:\n1. Load clothes and close door firmly.\n2. Add detergent (left) and softener (right, optional).\n3. Insert 30 THB in 10-coin increments — light will blink.\n4. Press the red "Start" button. Cycle: ~1 hour.\nError E40: Door not closed — open, lift slightly, close firmly, press Start.\nIf machine rejects coins: deposit 30 THB in the Honest Box.\n\nHow to use the Dryer:\n1. Load wet clothes (don't overload).\n2. Insert 50 THB in 10-coin increments — starts automatically.\n3. Drying time: ~1 hour.\n\n🛋 Lobby / Reception\nOpen to all guests. Sit, eat, work, socialize — feel at home!\nPlease keep it clean and keep noise low.\n\n🅿️ Parking\nNo designated parking. All vehicles parked at owner's risk.\nNiece Hostel assumes no liability for vehicles or their contents.`,
+      transport: `🚕 Taxi & Ride-Hailing\nWe recommend: Grab, Bolt, or inDrive\n\n🏍 Motorbike Rental\nHonda Click 150cc: 250 THB/day\nHonda Click 160cc: 300 THB/day\nDeposit: 2,000 THB (cash only, any currency)\nPick-up & Return: 10:45 AM – 4:00 PM\nDuration: 24 hours from pick-up time | Payment: Cash only\n\nRequired: Passport + International driving license + 2,000 THB deposit + rental fee.\nPlease reserve at least 1 day in advance.\nFor urgent rentals, we can recommend a nearby shop.\n\n🚲 Free Bicycles\nAvailable first-come, first-served. Hours: 7:00 AM – sunset.\nSign out before taking a bike. Return to designated rack when done.\nYou are responsible for the bike — do not leave unattended or unlocked.\n\n🚌 Getting Around\nFrom Phuket Town: Airport, Koh Yao, Phang-Nga, Krabi, Surat-thani, Nakornsirthammarat, Hadyai, Ranong, and more.`,
+      activities: `🏝 Island Tours\nVarious island tours in the Phuket area — ask us for recommendations.\n\n🤿 Snorkeling & Diving\nTours available for all experience levels.\n\n🍜 Cooking Classes\nSeasoning Phuket Thai Cooking Class — a local favourite!\n\nHow to Book a Tour:\nPlease inform us at least 1 day in advance.\n1. Pay in cash.\n2. We transfer your payment to the tour operator.\n3. You receive a booking confirmation once complete.\n\nContact us: WhatsApp / Line: +66625469878`,
+      extra: `💰 Extra Charges\nLate check-out (after 12:00 PM): Full extra day charge\nLost/damaged access card or key: 300 THB\nRoom change without permission: 2,000 THB\nSmoking indoors: 2,000 THB (Thai law)\nDrug use on premises: 5,000 THB + immediate eviction (no refund)\nUnattended cooking: 2,000 THB fine\nDorm rule violation (taking others' bedding): 300 THB per incident\nDamage to hostel property: 150% of full replacement value\n(Includes permanent stains, removed items, broken appliances, etc.)\n\nAll charges are the responsibility of the registered guest.\nIn extreme cases, criminal charges may be pursued.`,
+      contact: `📞 Contact Us\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram\n+66625469878\nEmail: niecehostel@gmail.com\n\n📩 Contact Hours: 10:00 AM – 10:00 PM daily\n\n🚨 Emergency (10:00 PM – 10:00 AM only)\nCall: 065-287-4666\n\nWe do not have permanent staff on-site.\nWe respond to all messages as quickly as possible.`,
+      faq: `Q: What time is check-in and check-out?\nA: Check-in at 2:00 PM. Check-out at 12:00 PM (noon).\n\nQ: Can I check in early or check out late?\nA: Early check-in is subject to availability — leave your bags and wait in the lobby if needed. Late check-out is generally not available, and if approved it's charged as a full extra day.\n\nQ: Is there staff at the hostel?\nA: No permanent staff on-site. We are available via WhatsApp/Line: +66625469878 between 10 AM – 10 PM.\n\nQ: What is the Wi-Fi password?\nA: Network: NIECEHOSTEL_2.4G or NIECEHOSTEL_5G | Password: YOUWONTGUESSTHISONE357\n\nQ: How does room cleaning work?\nA: Rooms are cleaned every 3rd day of your stay.\n\nQ: Can I store luggage after check-out?\nA: Yes! Please don't leave valuables inside — we are not responsible for lost valuables.\n\nQ: Are there dogs at the hostel?\nA: Yes! Sundae and Soufflé, our friendly dog receptionists, may be in the lobby occasionally. Let us know if you're uncomfortable or have allergies.\n\nQ: Is parking available?\nA: No designated parking. All vehicles parked at owner's risk.\n\nQ: Can I rent a motorbike?\nA: Yes! Honda Click 150cc at 250 THB/day or 160cc at 300 THB/day. Please reserve 1 day in advance.\n\nQ: How do I book a tour or activity?\nA: Contact us at least 1 day in advance via WhatsApp/Line: +66625469878.`,
+      survey: `We'd love to hear about your stay! 🌿\nYour feedback helps us improve for all guests.\n\nPlease fill out our short survey:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nThank you for choosing Niece Hostel!`
     },
     th: {
-      smoking: `ห้ามสูบบุหรี่ในทุกห้องอย่างเด็ดขาด รวมถึงบุหรี่, บุหรี่ไฟฟ้า และอุปกรณ์สูบไอทุกชนิด\nหากพบหลักฐานการสูบบุหรี่ในห้อง จะเรียกเก็บค่าทำความสะอาดพิเศษ 30,000 เยน\nมีพื้นที่สูบบุหรี่กำหนดไว้ด้านนอกอาคาร`,
-      wifi: `ชื่อเครือข่าย: NIECE_HOSTEL_GUEST\nรหัสผ่าน: nicestay2024\nWi-Fi ฟรีตลอดทั่วโฮสเทล\nหากมีปัญหาการเชื่อมต่อ ติดต่อแผนกต้อนรับที่ ต่อ 1`,
-      cleaning: `บริการ ECO (ทุกการเข้าพัก): เปลี่ยนผ้าเช็ดตัว + เก็บขยะ โดยไม่เข้าห้อง วางผ้าเช็ดตัวที่ใช้แล้วในถุง eco สีแดง ไว้หน้าประตูก่อน 13:00 น. ผ้าเช็ดตัวใหม่จะอยู่ในถุง eco สีน้ำเงิน\n\nพักค้าง 2–3 คืน: ไม่มีบริการทำความสะอาดปกติ หากต้องการให้ทำความสะอาด วางแม่เหล็ก "Please Clean" บนประตูก่อน 13:00 น.\n\nพัก 4 คืนขึ้นไป: ทำความสะอาดเต็มรูปแบบทุก 3 วัน วันอื่นใช้บริการ ECO`,
-      hotel: `เช็คเอาต์: 11:00 น.\nเช็คเอาต์ช้า: 1,000 เยนต่อชั่วโมง หลัง 11:00 น.\nกรุณาคืนบัตรกุญแจที่กล่องชั้น 1\n\nสิ่งอำนวยความสะดวก: แปรงสีฟันและของใช้ฟรีที่ล็อบบี้ชั้น 1\n\nสิ่งอำนวยความสะดวก (ชั้น 2): ไมโครเวฟ, ตู้ขายของอัตโนมัติ และเครื่องซักผ้าหยอดเหรียญ\n\nน้ำแข็ง: ไม่มีเครื่องทำน้ำแข็ง ขอได้ที่แผนกต้อนรับ\n\nทางเข้า: ล็อคตั้งแต่ 00:00 ถึง 05:00 น. ใช้บัตรกุญแจแตะที่เซ็นเซอร์ด้านขวาของทางเข้า`,
-      aircon: `ทุกห้องมีเครื่องปรับอากาศพร้อมรีโมทคอนโทรลส่วนตัว\nปรับอุณหภูมิตามที่ต้องการได้\nกรุณาปิดเครื่องปรับอากาศเมื่อออกจากห้องเพื่อประหยัดพลังงาน\nหากมีปัญหา ติดต่อแผนกต้อนรับที่ ต่อ 1`,
-      luggage: `บริการฝากกระเป๋าเฉพาะวันเช็คอินและเช็คเอาต์เท่านั้น\nไม่สามารถฝากกระเป๋าเกิน 1 วัน\nติดต่อแผนกต้อนรับ บริการฟรี`,
-      extra: `เช็คเอาต์ช้า (หลัง 11:00 น.): 1,000 เยนต่อชั่วโมง\nฝ่าฝืนนโยบายสูบบุหรี่ (ค่าทำความสะอาด): 30,000 เยน\nบัตรกุญแจสูญหาย: กรุณาถามที่แผนกต้อนรับ\nความเสียหายในห้อง: ตามความเสียหายจริง\n\nค่าใช้จ่ายทั้งหมดจะเรียกเก็บจากบัตรเครดิตหรือชำระเมื่อเช็คเอาต์`,
-      faq: `Q: เช็คอินได้กี่โมง?\nA: เช็คอินตั้งแต่ 15:00 น. อาจมีเช็คอินเร็วได้ กรุณาถามที่แผนกต้อนรับ\n\nQ: มีเคอร์ฟิวมั้ย?\nA: ไม่มี แต่ประตูทางเข้าล็อคตั้งแต่ 00:00 ถึง 05:00 น. ใช้บัตรกุญแจเข้าได้\n\nQ: ร้านสะดวกซื้ออยู่ไหน?\nA: มีร้านสะดวกซื้อห่างออกไปประมาณ 2 นาทีเดิน\n\nQ: รวมอาหารเช้ามั้ย?\nA: ไม่รวม ถามแนะนำร้านอาหารได้ที่แผนกต้อนรับ\n\nQ: ขอผ้าเช็ดตัวเพิ่มได้มั้ย?\nA: ได้เลย มีที่แผนกต้อนรับ`,
-      survey: `เราอยากฟังความคิดเห็นเกี่ยวกับการเข้าพักของคุณ!\nข้อเสนอแนะของคุณช่วยให้เราพัฒนาได้ดีขึ้น\n\nกรอกแบบสอบถามสั้นๆ ของเราได้ที่:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nขอบคุณที่เลือกพักที่ Niece Hostel! 🌿`
+      hotel: `ยินดีต้อนรับสู่ Niece Hostel! 🌿\nดีใจมากที่มีคุณมาพักที่นี่ หวังว่าคุณจะมีช่วงเวลาที่ดี\n\nไม่มีพนักงานประจำที่โรงแรม แต่เราพร้อมตอบข้อความตลอดเวลา\n📩 เวลาติดต่อ: 10:00 – 22:00 น.\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram: +66625469878\nอีเมล: niecehostel@gmail.com\n\n🚨 ฉุกเฉิน (22:00 – 10:00 น. เท่านั้น): 065-287-4666`,
+      smoking: `🚭 ห้ามสูบบุหรี่ทั้งอาคาร\n⚠️ ปรับ 2,000 บาท หากสูบบุหรี่ในอาคาร (ตามกฎหมายไทย)\nพื้นที่สูบบุหรี่: ด้านหน้าอาคารเท่านั้น\nห้ามสูบบุหรี่ในอาคารอย่างเด็ดขาด รวมถึงบุหรี่ บุหรี่ไฟฟ้า และอุปกรณ์ไอทุกชนิด`,
+      checkin: `เวลาเช็คอิน: 14:00 น.\nเวลาเช็คเอาต์: 12:00 น. (เที่ยงวัน)\n\nเช็คเอาต์แบบ Express: มีให้บริการ\n\nเช็คอินก่อนเวลา: ขึ้นอยู่กับความพร้อมของห้อง หากห้องยังไม่พร้อม สามารถฝากกระเป๋าและรอในล็อบบี้ได้\n\nเช็คเอาต์ช้า: โดยปกติไม่มีบริการ เนื่องจากมีตารางทำความสะอาดที่แน่นอน หากจำเป็น ขึ้นอยู่กับความพร้อมของห้องและคิดค่าใช้จ่ายเต็มวัน กรุณาแจ้งล่วงหน้า 1 วัน\n\nหลังเช็คเอาต์: สามารถนั่งพักและใช้สิ่งอำนวยความสะดวกได้\n\nต่อเวลาพัก: กรุณาแจ้งก่อน 10:00 น. ของวันเช็คเอาต์ (ขึ้นอยู่กับห้องว่าง)\n\nการชำระเงิน & การยกเลิก: ชำระเงินก่อนเข้าพัก ยอดขายทั้งหมดเป็นที่สิ้นสุดและไม่สามารถขอคืนเงินได้`,
+      rules: `"เปิดแล้วปิด หยิบแล้วคืน เปิดแล้วปิด พังแล้วซ่อม ใช้แล้วดูแล รกแล้วเก็บ ย้ายแล้วคืนที่"\n\n🌙 เวลาเงียบ: 22:00 – 09:00 น.\n🚬 สูบบุหรี่: ด้านหน้าอาคารเท่านั้น ปรับ 2,000 บาทหากสูบในอาคาร\n🍺 ยาเสพติด & อาวุธ: ห้ามนำเข้าในพื้นที่โดยเด็ดขาด ปรับ 5,000 บาทสำหรับการใช้ยาเสพติด และถูกไล่ออกทันทีโดยไม่มีการคืนเงิน\n👥 ผู้มาเยี่ยม: ผู้ที่ไม่ได้ลงทะเบียนไม่อนุญาตให้เข้าพื้นที่หวงห้ามของโรงแรม สามารถพบปะกันได้ที่ล็อบบี้\n🔑 บัตรเข้า/กุญแจหาย: ค่าเปลี่ยน 300 บาท\n🚪 เปลี่ยนห้อง: ห้ามเปลี่ยนห้องโดยไม่ได้รับอนุญาต ปรับ 2,000 บาท\n💥 ความเสียหาย: คิดค่าเสียหาย 150% ของราคาทดแทนเต็มจำนวน อาจมีการดำเนินคดีในกรณีร้ายแรง\n🛏 กฎห้องพักรวม: ห้ามหยิบผ้าปูที่นอน หมอน หรือผ้าเช็ดตัวจากเตียงอื่น (ปรับ 300 บาท) ห้ามเปลี่ยนเตียง แอร์ตั้งไว้ที่ 25°C หลีกเลี่ยงน้ำหอมแรง แขวนผ้าเปียกที่พื้นที่ซักล้าง\n🔒 ของหาย: โรงแรมไม่รับผิดชอบต่อของหายหรือเสียหาย กรุณาใช้ล็อกเกอร์ในห้องพัก`,
+      wifi: `📶 เครือข่าย Wi-Fi\nNIECEHOSTEL_2.4G — ครอบคลุมพื้นที่ทั่วโรงแรม\nNIECEHOSTEL_5G — ความเร็วสูงกว่า ระยะใกล้เราเตอร์\n\n🔑 รหัสผ่าน: YOUWONTGUESSTHISONE357\n\nสแกน QR code ด้านล่างเพื่อเชื่อมต่ออัตโนมัติ ไม่ต้องพิมพ์รหัส!\n\n[WIFI_QR:NIECEHOSTEL_2.4G:YOUWONTGUESSTHISONE357]\n\nหากมีปัญหาการเชื่อมต่อ ติดต่อเราผ่าน WhatsApp/Line: +66625469878`,
+      cleaning: `ตารางทำความสะอาดห้อง\nห้องจะถูกทำความสะอาดทุก 3 วันของการเข้าพัก\nตัวอย่าง: เช็คอินวันที่ 1 → ทำความสะอาดวันที่ 3 → วันที่ 6 และต่อๆ ไป\n\nหากต้องการทำความสะอาดนอกตาราง กรุณาส่งข้อความมาหาเรา`,
+      aircon: `เครื่องปรับอากาศ — นโยบายห้องพักรวม\nแอร์ตั้งไว้ที่ 25°C\nกรุณาอย่าเปลี่ยนอุณหภูมิ เว้นแต่ผู้พักทุกคนในห้องเห็นชอบกับอุณหภูมิเดียวกัน\n\nหากรู้สึกหนาว สามารถขอผ้าห่มเพิ่มเติมได้จากเจ้าหน้าที่\nห้ามหยิบผ้าห่ม หมอน หรือผ้าเช็ดตัวจากเตียงอื่น (ปรับ 300 บาท)`,
+      luggage: `บริการฝากกระเป๋า\nเรายินดีฝากกระเป๋าให้ก่อนเช็คอินหรือหลังเช็คเอาต์\n\n⚠️ สำคัญ: กรุณาอย่าเก็บของมีค่าในกระเป๋าขณะฝาก\nโรงแรมไม่รับผิดชอบต่อการสูญหายหรือความเสียหายของของมีค่า\n\nสอบถามการฝากกระเป๋าได้ที่:\nWhatsApp / Line: +66625469878`,
+      facilities: `🍳 ครัวส่วนกลาง\nมีอุปกรณ์ครบครันสำหรับผู้เข้าพักทุกคน\n• ห้ามทิ้งอาหารที่กำลังปรุงไว้โดยไม่มีคนดูแล — ปรับ 2,000 บาท\n• กรุณาล้างจาน หม้อ และกระทะหลังใช้งาน\n• ห้ามทิ้งอาหารที่ปรุงแล้วไว้ในภาชนะ\n• ความเสียหายของอุปกรณ์จากการใช้ผิดประเภทจะถูกคิดเต็มราคา\n\n🧺 ห้องซักรีด (ชั้น 1 ด้านหลังโรงแรม)\nเครื่องซัก: 30 บาท | เครื่องอบ: 50 บาท | ผงซักฟอก: 5 บาท (ใส่กล่อง Honest Box)\nชำระด้วยเหรียญ 10 บาทเท่านั้น\n\nวิธีใช้เครื่องซัก:\n1. ใส่ผ้าและปิดฝาให้สนิท\n2. ใส่ผงซักฟอก (ซ้าย) และน้ำยาปรับผ้านุ่ม (ขวา ถ้าต้องการ)\n3. หยอดเหรียญ 30 บาท — ไฟจะกะพริบ\n4. กดปุ่ม "Start" สีแดง ใช้เวลาประมาณ 1 ชั่วโมง\nError E40: ประตูปิดไม่สนิท — เปิด ยกเล็กน้อย ปิดให้แน่น กด Start\nหากเครื่องไม่รับเหรียญ: ซักได้เลยแล้วใส่เงิน 30 บาทในกล่อง Honest Box\n\nวิธีใช้เครื่องอบ:\n1. ใส่ผ้าเปียก (อย่าใส่เกินไป)\n2. หยอดเหรียญ 50 บาท — เครื่องจะเริ่มอัตโนมัติ\n3. ใช้เวลาประมาณ 1 ชั่วโมง\n\n🛋 ล็อบบี้ / แผนกต้อนรับ\nเปิดให้ผู้พักทุกคนใช้นั่งเล่น รับประทานอาหาร ทำงาน หรือพักผ่อน กรุณาช่วยกันรักษาความสะอาดและเงียบเสียง\n\n🅿️ ที่จอดรถ\nไม่มีที่จอดรถโดยเฉพาะ ผู้ขับขี่จอดรถด้วยความเสี่ยงของตนเอง`,
+      transport: `🚕 แท็กซี่ & บริการเรียกรถ\nแนะนำ: Grab, Bolt หรือ inDrive\n\n🏍 เช่ามอเตอร์ไซค์\nHonda Click 150cc: 250 บาท/วัน\nHonda Click 160cc: 300 บาท/วัน\nมัดจำ: 2,000 บาท (เงินสดทุกสกุลเงิน)\nรับ & คืน: 10:45 – 16:00 น. | ระยะเวลา: 24 ชั่วโมง\nชำระด้วยเงินสดเท่านั้น\n\nเอกสารที่ต้องเตรียม: หนังสือเดินทาง + ใบขับขี่สากล + มัดจำ 2,000 บาท + ค่าเช่า\nกรุณาจองล่วงหน้า 1 วัน สำหรับการเช่าเร่งด่วน เราแนะนำร้านใกล้เคียงได้\n\n🚲 จักรยานฟรี\nจ่าย first-come first-served เวลาใช้: 07:00 น. – ตะวันตกดิน\nลงทะเบียนก่อนนำออก คืนที่แร็คที่กำหนด รับผิดชอบจักรยานระหว่างการใช้งาน\n\n🚌 การเดินทางรอบพื้นที่\nจากภูเก็ตทาวน์: สนามบิน เกาะยาว พังงา กระบี่ สุราษฎร์ธานี นครศรีธรรมราช หาดใหญ่ ระนอง และอื่นๆ`,
+      activities: `🏝 ทัวร์เกาะ\nมีทัวร์หลายแบบในพื้นที่ภูเก็ต ถามเราสำหรับคำแนะนำ\n\n🤿 ดำน้ำตื้น & ดำน้ำลึก\nทัวร์สำหรับทุกระดับความสามารถ\n\n🍜 คลาสทำอาหาร\nSeasoning Phuket Thai Cooking Class — คลาสทำอาหารไทยสุดยอดในภูเก็ต!\n\nวิธีจอง:\nแจ้งล่วงหน้าอย่างน้อย 1 วัน\n1. ชำระเงินสด\n2. เราโอนเงินให้บริษัททัวร์\n3. รับการยืนยันการจองเมื่อเสร็จสิ้น\n\nติดต่อ: WhatsApp / Line: +66625469878`,
+      extra: `💰 ค่าใช้จ่ายเพิ่มเติม\nเช็คเอาต์ช้า (หลัง 12:00 น.): คิดค่าห้องเต็มวันพิเศษ\nบัตรเข้า/กุญแจหายหรือเสียหาย: 300 บาท\nเปลี่ยนห้องโดยไม่ได้รับอนุญาต: 2,000 บาท\nสูบบุหรี่ในอาคาร: 2,000 บาท (กฎหมายไทย)\nใช้ยาเสพติดในพื้นที่: 5,000 บาท + ไล่ออกทันที (ไม่คืนเงิน)\nทิ้งอาหารปรุงโดยไม่มีคนดูแล: 2,000 บาท\nหยิบผ้าปูที่นอนจากเตียงอื่น: 300 บาท\nความเสียหายต่อทรัพย์สินโรงแรม: 150% ของมูลค่าทดแทน\n(รวมถึงคราบถาวร ของสูญหาย อุปกรณ์แตกหัก ฯลฯ)\n\nค่าใช้จ่ายทั้งหมดเป็นความรับผิดชอบของผู้พักที่ลงทะเบียน\nในกรณีร้ายแรงอาจมีการดำเนินคดีทางอาญา`,
+      contact: `📞 ติดต่อเรา\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram\n+66625469878\nอีเมล: niecehostel@gmail.com\n\n📩 เวลาติดต่อ: 10:00 – 22:00 น. ทุกวัน\n\n🚨 ฉุกเฉิน (22:00 – 10:00 น. เท่านั้น)\nโทร: 065-287-4666\n\nไม่มีพนักงานประจำที่โรงแรม\nเราตอบข้อความทุกข้อความเร็วที่สุดเท่าที่ทำได้`,
+      faq: `Q: เช็คอินและเช็คเอาต์กี่โมง?\nA: เช็คอิน 14:00 น. เช็คเอาต์ 12:00 น.\n\nQ: เช็คอินก่อนหรือเช็คเอาต์ช้าได้มั้ย?\nA: เช็คอินก่อนขึ้นอยู่กับความพร้อมของห้อง สามารถฝากกระเป๋าและรอในล็อบบี้ได้ เช็คเอาต์ช้าปกติไม่มี หากได้รับอนุมัติจะคิดค่าห้องเต็มวัน\n\nQ: มีพนักงานที่โรงแรมมั้ย?\nA: ไม่มีพนักงานประจำ ติดต่อได้ผ่าน WhatsApp/Line: +66625469878 เวลา 10:00 – 22:00 น.\n\nQ: รหัส Wi-Fi คืออะไร?\nA: เครือข่าย: NIECEHOSTEL_2.4G หรือ NIECEHOSTEL_5G | รหัสผ่าน: YOUWONTGUESSTHISONE357\n\nQ: ห้องทำความสะอาดกี่วัน?\nA: ทุก 3 วันของการเข้าพัก\n\nQ: ฝากกระเป๋าหลังเช็คเอาต์ได้มั้ย?\nA: ได้ แต่กรุณาอย่าเก็บของมีค่าไว้ในกระเป๋า\n\nQ: มีหมาที่โรงแรมมั้ย?\nA: มี! Sundae และ Soufflé น้องหมาพนักงานต้อนรับของเรา อาจอยู่ในล็อบบี้บางครั้ง หากแพ้ขนสัตว์หรือไม่สบายใจ แจ้งเราได้\n\nQ: มีที่จอดรถมั้ย?\nA: ไม่มีที่จอดรถโดยเฉพาะ จอดด้วยความเสี่ยงของตัวเอง\n\nQ: เช่ามอเตอร์ไซค์ได้มั้ย?\nA: ได้! Honda Click 150cc 250 บาท/วัน หรือ 160cc 300 บาท/วัน จองล่วงหน้า 1 วัน\n\nQ: จะจองทัวร์ได้อย่างไร?\nA: แจ้งเราล่วงหน้าอย่างน้อย 1 วัน ผ่าน WhatsApp/Line: +66625469878`,
+      survey: `เราอยากได้ยินความคิดเห็นเกี่ยวกับการเข้าพักของคุณ! 🌿\nข้อเสนอแนะของคุณช่วยให้เราพัฒนาได้ดีขึ้น\n\nกรอกแบบสอบถามสั้นๆ ของเรา:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nขอบคุณที่เลือกพักที่ Niece Hostel!`
     },
     zh: {
-      smoking: `所有房间严禁吸烟，包括香烟、电子烟及所有吸烟装置。\n如在房间内发现吸烟证据，将收取30,000日元特别清洁费。\n楼外设有指定吸烟区。`,
-      wifi: `网络名称：NIECE_HOSTEL_GUEST\n密码：nicestay2024\n整个旅舍提供免费Wi-Fi。\n如有连接问题，请拨打内线1联系前台。`,
-      cleaning: `ECO服务（适用所有住客）：仅换毛巾+收垃圾，不进入房间。下午1点前将用过的毛巾放入门外红色环保袋，新毛巾将放入蓝色环保袋。\n\n入住2-3晚：不提供常规客房清洁。如需清洁，请在下午1点前将"请打扫"磁贴放在门上。\n\n入住4晚及以上：每3天进行一次全面清洁，其余为ECO服务。`,
-      hotel: `退房时间：上午11:00\n逾时退房：11:00后每小时1,000日元\n请将房卡归还至1楼回收箱\n\n便利设施：1楼大堂免费提供牙刷等洗漱用品\n\n公共设施（2楼）：微波炉、自动贩卖机和投币洗衣机\n\n冰块：无制冰机，请向前台索取\n\n入口：凌晨0点至5点锁闭，使用房卡感应右侧传感器`,
-      aircon: `每间客房均配有独立空调和遥控器。\n可按个人喜好调节温度。\n外出时请关闭空调节约能源。\n如有问题，请拨打内线1联系前台。`,
-      luggage: `行李寄存服务仅限入住及退房当日。\n不接受超过一天的寄存。\n请向前台申请，免费提供。`,
-      extra: `逾时退房（11:00后每小时）：1,000日元\n吸烟违规（特别清洁费）：30,000日元\n房卡遗失：请询问前台\n房间损坏：按实际费用收取\n\n所有费用将从存档信用卡扣除或于退房时结算。`,
-      faq: `Q：几点可以入住？\nA：下午3点起办理入住。如需提前入住，请咨询前台。\n\nQ：有宵禁吗？\nA：没有宵禁，但入口从凌晨0点至5点上锁，使用房卡即可进入。\n\nQ：附近有便利店吗？\nA：步行约2分钟处有便利店。\n\nQ：含早餐吗？\nA：不含。如需餐厅推荐，请咨询前台。\n\nQ：可以要更多毛巾吗？\nA：可以！前台备有额外毛巾。`,
-      survey: `我们非常希望了解您的入住体验！\n您的反馈将帮助我们持续改进。\n\n请填写我们的简短问卷：\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\n感谢您选择Niece Hostel！🌿`
+      hotel: `欢迎来到Niece Hostel！🌿\n很高兴您选择入住，希望您在这里度过愉快的时光。\n\n酒店没有常驻工作人员，但我们随时通过消息为您提供帮助。\n📩 联系时间：上午10:00 – 晚上10:00\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram：+66625469878\n邮箱：niecehostel@gmail.com\n\n🚨 紧急情况（晚10点至早10点）：065-287-4666`,
+      smoking: `🚭 全面禁烟\n⚠️ 室内吸烟罚款 2,000 泰铢（泰国法律）\n吸烟区：仅限楼外正门前\n严禁在室内吸烟，包括香烟、电子烟及各类吸烟装置`,
+      checkin: `入住时间：下午2:00（14:00）\n退房时间：中午12:00\n\n快速退房：可办理\n\n提前入住：视房间状况而定。如房间尚未准备好，欢迎将行李存放于前台并在大厅等候。\n\n延迟退房：通常不可提供。如需延迟退房，视客房情况收取整天额外费用（12:00后），请至少提前1天申请。\n\n退房后：欢迎继续在我们的设施中休息，无需急于离开！\n\n延长住宿：请在退房日上午10:00前告知（视房间空档而定）。\n\n付款与取消：入住前须完成付款。所有销售均为最终确认，不予退款。`,
+      rules: `"打开了就关上，借了就还，开了就关，坏了就修，用了就爱护，弄乱了就整理，移动了就放回原处。"\n\n🌙 安静时间：晚上10:00 – 早上9:00\n🚬 吸烟：仅限楼外前门处。室内吸烟罚款2,000泰铢。\n🍺 毒品与武器：严禁在任何区域携带。使用毒品罚款5,000泰铢，并立即驱逐，不予退款。\n👥 访客：未登记客人不得进入住宿限制区域，朋友可在大堂会面。\n🔑 门卡/钥匙丢失：补换费300泰铢。\n🚪 换房：未经许可不得换房，违规罚款2,000泰铢。\n💥 财产损坏：按全额更换价值的150%收费，情节严重者将追究法律责任。\n🛏 宿舍规则：不得拿取他人床铺被褥/枕头/毛巾（罚款300泰铢）。不得换床。空调固定25°C，如需调整须全体室友同意。避免使用浓烈香水。湿衣物请在洗衣区晾晒。\n🔒 财物安全：Niece Hostel不对宾客财物的丢失或损坏负责，请使用房间内提供的储物柜。`,
+      wifi: `📶 Wi-Fi网络\nNIECEHOSTEL_2.4G — 覆盖范围更广\nNIECEHOSTEL_5G — 速度更快，近距离效果更佳\n\n🔑 密码：YOUWONTGUESSTHISONE357\n\n扫描下方二维码即可自动连接，无需手动输入密码！\n\n[WIFI_QR:NIECEHOSTEL_2.4G:YOUWONTGUESSTHISONE357]\n\n如有连接问题，请通过WhatsApp/Line联系：+66625469878`,
+      cleaning: `客房清洁时间表\n每入住第三天进行一次客房清洁。\n例如：1日入住 → 3日清洁 → 6日清洁，以此类推。\n\n如需在计划外安排清洁，请发消息给我们。`,
+      aircon: `空调 — 宿舍规定\n空调预设温度为25°C。\n未经全体室友同意，请勿更改温度设置。\n\n如感到寒冷，可向工作人员索取额外毯子。\n请勿拿取他人床铺的毯子、枕头或毛巾（罚款300泰铢）。`,
+      luggage: `行李寄存\n欢迎在入住前或退房后将行李寄存于我们这里。\n\n⚠️ 重要提示：请勿将贵重物品存放于寄存行李中。\nNiece Hostel不对贵重物品的丢失或损坏负责。\n\n安排行李寄存，请联系：\nWhatsApp / Line：+66625469878`,
+      facilities: `🍳 公共厨房\n厨房设施齐全，供所有住客使用。\n• 严禁将烹饪中的食物无人看管 — 违规罚款2,000泰铢。\n• 使用后请清洁厨房，并洗净所有餐具、锅具。\n• 请勿将煮好的食物留在锅中。\n• 因使用不当造成的电器损坏，将按全额更换费用收取。\n\n🧺 洗衣房（1楼，酒店后方）\n洗衣机：30泰铢 | 烘干机：50泰铢 | 洗涤剂：5泰铢（诚信箱）\n请使用10泰铢硬币支付。\n\n洗衣机使用步骤：\n1. 放入衣物并关好舱门。\n2. 加入洗涤剂（左槽）和柔顺剂（右槽，可选）。\n3. 投入30泰铢硬币 — 指示灯闪烁。\n4. 按红色"开始"按钮。洗涤时间约1小时。\nE40错误：舱门未关好 — 开门、稍微抬起、关紧，再按开始。\n若机器不接受硬币：正常洗涤后，将30泰铢投入诚信箱。\n\n烘干机使用步骤：\n1. 放入湿衣物（勿过满）。\n2. 投入50泰铢硬币 — 自动启动。烘干时间约1小时。\n\n🛋 大厅/前台区\n欢迎所有住客使用 — 坐坐、吃饭、工作、社交，随意放松！请保持整洁，控制噪音。\n\n🅿️ 停车\n无专属停车位。停车风险自负。Niece Hostel不对车辆或车内物品承担任何责任。`,
+      transport: `🚕 出租车及网约车\n推荐使用：Grab、Bolt 或 inDrive\n\n🏍 摩托车租赁\nHonda Click 150cc：250泰铢/天\nHonda Click 160cc：300泰铢/天\n押金：2,000泰铢（仅限现金，任意货币）\n取车/还车：10:45 – 16:00 | 租用时长：24小时\n付款方式：仅限现金\n\n所需材料：护照 + 国际驾照 + 2,000泰铢押金 + 租车费用\n请至少提前1天预约。如需紧急租车，我们可推荐附近租车店。\n\n🚲 免费自行车\n先到先得。使用时间：早上7:00至日落。\n取车前请登记，使用后归还至指定车架。使用期间自行负责，不得无锁无人看管。\n\n🚌 出行指南\n从普吉镇可前往：机场、甲米岛、攀牙、甲米、苏叻他尼、那空是贪玛叻、合艾、拉廊等地。`,
+      activities: `🏝 海岛游览\n普吉岛周边提供多种海岛之旅 — 欢迎询问我们的推荐。\n\n🤿 浮潜与潜水\n适合各种经验水平的游客。\n\n🍜 烹饪课\nSeasoning Phuket Thai Cooking Class — 深受好评的泰国烹饪课！\n\n预订方式：\n请至少提前1天告知。\n1. 现金支付。\n2. 我们将款项转至旅游运营商。\n3. 完成后向您发送预订确认。\n\n联系方式：WhatsApp / Line：+66625469878`,
+      extra: `💰 额外收费说明\n延迟退房（12:00后）：按整天额外费用收取\n门卡/钥匙丢失或损坏：300泰铢\n未经许可换房：2,000泰铢\n室内吸烟：2,000泰铢（泰国法律）\n在场所内使用毒品：5,000泰铢 + 立即驱逐（不退款）\n无人看管烹饪：2,000泰铢\n拿取他人床铺被褥：每次300泰铢\n损坏酒店财产：全额更换价值的150%\n（包括永久性污渍、移除物品、损坏电器等）\n\n所有费用均由登记住客承担。情节严重者将追究刑事责任。`,
+      contact: `📞 联系我们\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram\n+66625469878\n邮箱：niecehostel@gmail.com\n\n📩 联系时间：每日上午10:00 – 晚上10:00\n\n🚨 仅限紧急情况（晚10点至早10点）\n电话：065-287-4666\n\n酒店无常驻工作人员。我们会尽快回复所有消息。`,
+      faq: `Q：入住和退房时间是？\nA：入住时间为下午2点（14:00），退房时间为中午12点。\n\nQ：可以提前入住或延迟退房吗？\nA：提前入住视房间情况而定，可将行李存放并在大厅等候。延迟退房通常不可提供，若获批将收取整天额外费用。\n\nQ：酒店有工作人员吗？\nA：没有常驻工作人员。可通过WhatsApp/Line联系：+66625469878，服务时间10:00-22:00。\n\nQ：Wi-Fi密码是什么？\nA：网络：NIECEHOSTEL_2.4G或NIECEHOSTEL_5G | 密码：YOUWONTGUESSTHISONE357\n\nQ：客房多久清洁一次？\nA：每入住第三天清洁一次。\n\nQ：退房后可以寄存行李吗？\nA：可以！请勿将贵重物品放入行李，我们不对贵重物品负责。\n\nQ：酒店有狗吗？\nA：有！Sundae和Soufflé是我们的狗狗前台，偶尔会在大厅。如对狗毛过敏或感到不适，请提前告知。\n\nQ：有停车位吗？\nA：没有专属停车位，停车风险自负。\n\nQ：可以租摩托车吗？\nA：可以！Honda Click 150cc每天250泰铢，160cc每天300泰铢，请提前1天预约。\n\nQ：如何预订活动或旅游？\nA：请至少提前1天通过WhatsApp/Line联系：+66625469878。`,
+      survey: `欢迎分享您的入住体验！🌿\n您的反馈将帮助我们持续改进。\n\n请填写我们的简短问卷：\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\n感谢您选择Niece Hostel！`
     },
     ru: {
-      smoking: `Курение строго запрещено во всех номерах, включая сигареты, электронные сигареты и вейпы.\nПри обнаружении следов курения взимается специальный сбор за уборку — 30 000 иен.\nОбозначенные места для курения находятся снаружи здания.`,
-      wifi: `Название сети: NIECE_HOSTEL_GUEST\nПароль: nicestay2024\nБесплатный Wi-Fi доступен по всему хостелу.\nПри проблемах с подключением звоните на ресепшн — добавочный номер 1.`,
-      cleaning: `ЭКО-сервис (для всех гостей): только смена полотенец и вывоз мусора, без входа в номер. До 13:00 оставьте использованные полотенца в красном эко-пакете у двери. Свежие полотенца будут в синем эко-пакете.\n\nПроживание 2–3 ночи: стандартная уборка не предусмотрена. Для заказа уборки повесьте магнит «Please Clean» до 13:00.\n\nПроживание от 4 ночей: полная уборка каждые 3 дня, остальные дни — ЭКО-сервис.`,
-      hotel: `Выезд: 11:00\nПоздний выезд: 1 000 иен в час после 11:00\nСдайте ключ-карту в ящик на 1-м этаже\n\nПринадлежности: бесплатно в холле 1-го этажа\n\nУдобства (2-й этаж): микроволновая печь, торговый автомат, монетная прачечная\n\nЛёд: льдогенератора нет — обратитесь на ресепшн\n\nВход: закрыт с 00:00 до 05:00. Прислоните ключ-карту к датчику справа от входа.`,
-      aircon: `В каждом номере индивидуальный кондиционер с пультом управления.\nНастройте удобную для вас температуру.\nПожалуйста, выключайте кондиционер при выходе из номера.\nПри неисправности звоните на ресепшн — добавочный номер 1.`,
-      luggage: `Хранение багажа доступно только в день заезда и выезда.\nХранение более одного дня невозможно.\nОбратитесь на ресепшн — услуга бесплатная.`,
-      extra: `Поздний выезд (после 11:00): 1 000 иен в час\nНарушение запрета курения (уборка): 30 000 иен\nУтеря ключ-карты: уточните на ресепшн\nПовреждение номера: по фактической стоимости\n\nВсе сборы списываются с карты на файле или оплачиваются при выезде.`,
-      faq: `Q: Во сколько заезд?\nA: Заезд с 15:00. Ранний заезд возможен — уточните на ресепшн.\n\nQ: Есть ли комендантский час?\nA: Нет, но вход закрыт с 00:00 до 05:00. Используйте ключ-карту.\n\nQ: Где ближайший магазин?\nA: Круглосуточный магазин в 2 минутах ходьбы.\n\nQ: Завтрак включён?\nA: Нет. Рекомендации ресторанов — на ресепшн.\n\nQ: Можно ли получить дополнительные полотенца?\nA: Да! Обратитесь на ресепшн.`,
-      survey: `Мы будем рады узнать о вашем пребывании!\nВаши отзывы помогают нам становиться лучше.\n\nЗаполните короткую анкету:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nСпасибо, что выбрали Niece Hostel! 🌿`
+      hotel: `Добро пожаловать в Niece Hostel! 🌿\nМы рады вашему приезду и надеемся, что вам понравится у нас.\n\nПостоянного персонала на месте нет, однако мы всегда готовы помочь через сообщения.\n📩 Часы связи: 10:00 – 22:00\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram: +66625469878\nEmail: niecehostel@gmail.com\n\n🚨 Экстренная связь (22:00 – 10:00): 065-287-4666`,
+      smoking: `🚭 Курение запрещено — весь хостел\n⚠️ Штраф 2 000 бат за курение внутри (закон Таиланда)\nМесто для курения: только перед зданием на улице\nСтрого запрещено: сигареты, электронные сигареты и вейпы внутри`,
+      checkin: `Время заезда: 14:00\nВремя выезда: 12:00 (полдень)\n\nЭкспресс-выезд: доступен\n\nРанний заезд: по наличию. Если номер ещё готовится, вы можете оставить вещи на ресепшн и подождать в лобби.\n\nПоздний выезд: как правило недоступен. При наличии мест — доплата в размере полного дня после 12:00. Просьба уточнять за 1 день.\n\nПосле выезда: вы можете оставаться в хостеле и пользоваться удобствами — никто не торопит!\n\nПродление проживания: сообщите нам до 10:00 в день выезда (при наличии мест).\n\nОплата и отмена: оплата производится до заезда. Все бронирования являются окончательными и не подлежат возврату.`,
+      rules: `«Открыл — закрой; взял — верни; включил — выключи; сломал — почини; пользуешься — береги; напачкал — убери; переставил — верни на место.»\n\n🌙 Тихие часы: 22:00 – 09:00\n🚬 Курение: только перед зданием. Штраф 2 000 бат за курение внутри.\n🍺 Наркотики и оружие: строго запрещены. Штраф 5 000 бат + немедленное выселение без возврата средств.\n👥 Гости: незарегистрированные посетители не допускаются в закрытые зоны хостела. Встречи с гостями — только в лобби.\n🔑 Утеря карты/ключа: замена 300 бат.\n🚪 Смена номера: без разрешения запрещена. Штраф 2 000 бат.\n💥 Ущерб имуществу: 150% от полной восстановительной стоимости. В крайних случаях — уголовное преследование.\n🛏 Правила общежития: запрещено брать постельные принадлежности с других кроватей (штраф 300 бат). Запрещено менять кровать. Кондиционер: 25°C — изменение только с согласия всех. Избегайте сильных духов. Мокрые вещи — в зоне стирки.\n🔒 Сохранность вещей: хостел не несёт ответственности за утерю или повреждение имущества. Используйте шкафчик в номере.`,
+      wifi: `📶 Сети Wi-Fi\nNIECEHOSTEL_2.4G — лучшее покрытие по всему хостелу\nNIECEHOSTEL_5G — более высокая скорость, оптимально вблизи роутера\n\n🔑 Пароль: YOUWONTGUESSTHISONE357\n\nОтсканируйте QR-код ниже для автоматического подключения — без ввода пароля!\n\n[WIFI_QR:NIECEHOSTEL_2.4G:YOUWONTGUESSTHISONE357]\n\nПри проблемах с подключением: WhatsApp/Line: +66625469878`,
+      cleaning: `Расписание уборки\nНомера убираются каждый третий день проживания.\nПример: заезд 1-го → уборка 3-го → следующая 6-го и т.д.\n\nДля дополнительной уборки вне расписания — напишите нам.`,
+      aircon: `Кондиционер — правила общежития\nКондиционер предустановлен на 25°C.\nПожалуйста, не меняйте температуру без согласия всех проживающих в номере.\n\nЕсли вам холодно, попросите дополнительное одеяло у персонала.\nЗапрещено брать одеяла, подушки или полотенца с других кроватей (штраф 300 бат).`,
+      luggage: `Хранение багажа\nМы рады принять ваш багаж до заезда или после выезда.\n\n⚠️ Важно: пожалуйста, не оставляйте ценности в сдаваемом на хранение багаже.\nNiece Hostel не несёт ответственности за утерю или повреждение ценностей.\n\nДля организации хранения свяжитесь с нами:\nWhatsApp / Line: +66625469878`,
+      facilities: `🍳 Общая кухня\nКухня полностью оборудована и доступна для всех гостей.\n• НЕЛЬЗЯ оставлять готовящуюся еду без присмотра — штраф 2 000 бат.\n• Пожалуйста, убирайте за собой и мойте посуду после использования.\n• Не оставляйте приготовленную еду в кастрюлях.\n• Поломка техники по вине гостя — полная стоимость замены.\n\n🧺 Прачечная (1-й этаж, задняя часть хостела)\nСтиральная машина: 30 бат | Сушилка: 50 бат | Порошок: 5 бат (Честная касса)\nОплата: монеты по 10 бат.\n\nКак пользоваться стиральной машиной:\n1. Загрузите одежду, плотно закройте дверцу.\n2. Добавьте порошок (левый отсек) и кондиционер (правый, по желанию).\n3. Вставьте 30 бат монетами — индикатор мигает.\n4. Нажмите красную кнопку «Старт». Цикл: ~1 час.\nОшибка E40: дверца не закрыта — откройте, чуть приподнимите, закройте плотно, нажмите Старт.\nЕсли машина не принимает монеты: постирайте, а 30 бат положите в Честную кассу.\n\nКак пользоваться сушилкой:\n1. Загрузите влажные вещи (не переполнять).\n2. Вставьте 50 бат монетами — запустится автоматически. Время: ~1 час.\n\n🛋 Лобби / Ресепшн\nОткрыто для всех гостей — сидите, ешьте, работайте, общайтесь!\nПожалуйста, поддерживайте чистоту и тишину.\n\n🅿️ Парковка\nСпециальной парковки нет. Все транспортные средства оставляются на риск владельца.`,
+      transport: `🚕 Такси и каршеринг\nРекомендуем: Grab, Bolt или inDrive\n\n🏍 Аренда мотоцикла\nHonda Click 150cc: 250 бат/день\nHonda Click 160cc: 300 бат/день\nДепозит: 2 000 бат (наличные, любая валюта)\nПолучение/возврат: 10:45 – 16:00 | Длительность: 24 часа\nОплата: только наличными\n\nНеобходимые документы: паспорт + международные права + 2 000 бат депозит + оплата аренды.\nБронируйте за 1 день. Для срочной аренды можем порекомендовать ближайший прокат.\n\n🚲 Бесплатные велосипеды\nПо принципу «кто первый пришёл». Часы: 7:00 – заход солнца.\nЗарегистрируйтесь перед использованием. Возвращайте на стойку. Вы несёте ответственность — не оставляйте без присмотра и незапертым.\n\n🚌 Транспорт по региону\nИз Пхукет-Тауна: аэропорт, Кох-Яо, Пханг-Нга, Краби, Сураттани, Накхон-Си-Таммарат, Хат-Яй, Ранонг и другие.`,
+      activities: `🏝 Туры на острова\nРазличные острова вокруг Пхукета — спросите наши рекомендации.\n\n🤿 Снорклинг и дайвинг\nТуры для любого уровня подготовки.\n\n🍜 Кулинарные курсы\nSeasoning Phuket Thai Cooking Class — популярные курсы тайской кухни!\n\nКак забронировать:\nСообщите нам минимум за 1 день.\n1. Оплата наличными.\n2. Мы переводим оплату туроператору.\n3. Вы получаете подтверждение бронирования.\n\nСвяжитесь с нами: WhatsApp / Line: +66625469878`,
+      extra: `💰 Дополнительные расходы\nПоздний выезд (после 12:00): оплата полного дня\nУтеря/повреждение карты/ключа: 300 бат\nСмена номера без разрешения: 2 000 бат\nКурение внутри помещения: 2 000 бат (закон Таиланда)\nУпотребление наркотиков: 5 000 бат + немедленное выселение (без возврата)\nОставленная без присмотра готовка: 2 000 бат\nЧужие постельные принадлежности: 300 бат за случай\nУщерб имуществу: 150% от полной восстановительной стоимости\n(включая несмываемые пятна, снятое оборудование, сломанную технику и т.д.)\n\nВсе расходы несёт зарегистрированный гость. В крайних случаях — уголовное преследование.`,
+      contact: `📞 Контакты\nWhatsApp / Line / iMessage / WeChat / KakaoTalk / Telegram\n+66625469878\nEmail: niecehostel@gmail.com\n\n📩 Часы работы: 10:00 – 22:00 ежедневно\n\n🚨 Только для экстренных случаев (22:00 – 10:00)\nТел.: 065-287-4666\n\nПостоянного персонала на месте нет. Мы отвечаем на все сообщения как можно быстрее.`,
+      faq: `Q: В какое время заезд и выезд?\nA: Заезд в 14:00, выезд в 12:00 (полдень).\n\nQ: Возможен ли ранний заезд или поздний выезд?\nA: Ранний заезд — по наличию, можно оставить вещи и ждать в лобби. Поздний выезд — как правило нет, при одобрении — оплата полного дня.\n\nQ: Есть ли персонал в хостеле?\nA: Постоянного персонала нет. Мы доступны через WhatsApp/Line: +66625469878 с 10:00 до 22:00.\n\nQ: Какой пароль от Wi-Fi?\nA: Сеть: NIECEHOSTEL_2.4G или NIECEHOSTEL_5G | Пароль: YOUWONTGUESSTHISONE357\n\nQ: Как часто убирают номера?\nA: Каждый третий день проживания.\n\nQ: Можно оставить багаж после выезда?\nA: Да! Пожалуйста, не оставляйте ценности — мы не несём за них ответственности.\n\nQ: В хостеле есть собаки?\nA: Да! Sundae и Soufflé — наши дружелюбные собаки-администраторы, иногда бывают в лобби. Если дискомфорт или аллергия — сообщите заранее.\n\nQ: Есть ли парковка?\nA: Специальной парковки нет, всё на риск владельца.\n\nQ: Можно арендовать мотоцикл?\nA: Да! Honda Click 150cc — 250 бат/день, 160cc — 300 бат/день. Бронируйте за 1 день.\n\nQ: Как забронировать тур или экскурсию?\nA: Сообщите нам минимум за 1 день через WhatsApp/Line: +66625469878.`,
+      survey: `Нам очень важно ваше мнение о пребывании! 🌿\nВаши отзывы помогают нам становиться лучше.\n\nПожалуйста, заполните короткую анкету:\nhttps://forms.gle/REPLACE_WITH_YOUR_LINK\n\nСпасибо, что выбрали Niece Hostel!`
     }
   }
 };
 
 /* ─── DEFAULT SECTIONS ─── */
 const DEFAULT_SECTIONS = [
-  { id:'smoking',  icon:'🚭', builtin:true },
-  { id:'wifi',     icon:'📶', builtin:true },
-  { id:'cleaning', icon:'🧹', builtin:true },
-  { id:'hotel',    icon:'🏨', builtin:true },
-  { id:'aircon',   icon:'❄️', builtin:true },
-  { id:'luggage',  icon:'🧳', builtin:true },
-  { id:'extra',    icon:'💳', builtin:true },
-  { id:'faq',      icon:'❓', builtin:true },
-  { id:'survey',   icon:'📝', builtin:true },
+  { id:'hotel',      icon:'🏨', builtin:true },
+  { id:'smoking',    icon:'🚭', builtin:true },
+  { id:'checkin',    icon:'🛎', builtin:true },
+  { id:'rules',      icon:'📋', builtin:true },
+  { id:'wifi',       icon:'📶', builtin:true },
+  { id:'cleaning',   icon:'🧹', builtin:true },
+  { id:'aircon',     icon:'❄️', builtin:true },
+  { id:'luggage',    icon:'🧳', builtin:true },
+  { id:'facilities', icon:'🍳', builtin:true },
+  { id:'transport',  icon:'🚌', builtin:true },
+  { id:'activities', icon:'🏝', builtin:true },
+  { id:'extra',      icon:'💳', builtin:true },
+  { id:'contact',    icon:'📞', builtin:true },
+  { id:'faq',        icon:'❓', builtin:true },
+  { id:'survey',     icon:'📝', builtin:true },
 ];
-const ICON_POOL = ['🚭','📶','🧹','🏨','❄️','🧳','💳','❓','📝','📌','🛎','🗝','🍜','🚿','🛏','🚌','🗺','💡','⚠️','📞','🌐','🅿️','🧴','🏊','🍳','🔑','🚪','🛁','📋','ℹ️'];
+const ICON_POOL = ['🚭','📶','🧹','🏨','❄️','🧳','💳','❓','📝','📌','🛎','🗝','🍜','🚿','🛏','🚌','🗺','💡','⚠️','📞','🌐','🅿️','🧴','🏊','🍳','🔑','🚪','🛁','📋','ℹ️','🏝','🤿'];
+
+/* ─── WELCOME BANNER MESSAGES ─── */
+const WELCOME = {
+  en: { title: 'Welcome to Niece Hostel 🌿', lines: [
+    "We're so happy you're here — make yourself at home!",
+    "If you need anything, we're just a message away.",
+    "📩 WhatsApp / Line: +66625469878  ·  10AM–10PM"
+  ]},
+  th: { title: 'ยินดีต้อนรับสู่ Niece Hostel 🌿', lines: [
+    "ดีใจมากที่มีคุณมา — รู้สึกสบายเหมือนบ้านนะคะ!",
+    "มีอะไรต้องการ ทักมาหาเราได้เลย",
+    "📩 WhatsApp / Line: +66625469878  ·  10:00–22:00"
+  ]},
+  zh: { title: '欢迎来到 Niece Hostel 🌿', lines: [
+    "很高兴有您入住，请随意放松，就像在家一样！",
+    "有任何需要，随时发消息给我们。",
+    "📩 WhatsApp / Line: +66625469878  ·  上午10点–晚上10点"
+  ]},
+  ru: { title: 'Добро пожаловать в Niece Hostel 🌿', lines: [
+    "Мы очень рады вас видеть — будьте как дома!",
+    "Если что-то нужно — просто напишите нам.",
+    "📩 WhatsApp / Line: +66625469878  ·  10:00–22:00"
+  ]}
+};
 
 /* ─── STATE ─── */
 let currentLang      = 'en';
-let adminSecCurrent  = 'smoking';
+let adminSecCurrent  = 'hotel';
 let adminLangCurrent = 'en';
 let secEditLang      = 'en';   // language active in section name editor
 let loginAttempts    = 0;
@@ -434,10 +548,26 @@ let editDraft        = {};
 let newSecIcon       = '📌';
 
 /* ─── STORAGE HELPERS ─── */
+const DATA_VERSION = '2.0';   // bump this whenever defaults change significantly
+
 const LS = {
   get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
   set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
 };
+
+// Auto-clear stale data from old versions on first load
+(function migrateStorage() {
+  const v = localStorage.getItem('niece_version');
+  if (v !== DATA_VERSION) {
+    // preserve PIN and profile, wipe everything else
+    const pin     = localStorage.getItem('niece_pin');
+    const profile = localStorage.getItem('niece_profile');
+    localStorage.clear();
+    if (pin)     localStorage.setItem('niece_pin', pin);
+    if (profile) localStorage.setItem('niece_profile', profile);
+    localStorage.setItem('niece_version', DATA_VERSION);
+  }
+})();
 
 function getPin()     { return localStorage.getItem('niece_pin')     || '999999'; }
 function getProfile() { return localStorage.getItem('niece_profile') || 'eve.bp'; }
@@ -519,13 +649,13 @@ function renderAll() {
     else { el.innerHTML = renderText(text); }
   });
 
-  // Smoking banner — show ALL lines
-  const sbEl = document.getElementById('sb-content');
-  if (sbEl) {
-    sbEl.innerHTML = (content.smoking || '')
-      .split('\n').filter(l => l.trim())
-      .map(l => `<p>${l}</p>`).join('');
-  }
+  // Welcome banner — fixed warm message, never from localStorage
+  const wm = WELCOME[L] || WELCOME.en;
+  const wbTitle = document.getElementById('wb-title');
+  if (wbTitle) wbTitle.textContent = wm.title;
+  const wbEl = document.getElementById('wb-content');
+  if (wbEl) wbEl.innerHTML = wm.lines.map(l => `<p>${l}</p>`).join('');
+
 
   // Re-run search if active
   const q = document.getElementById('searchInput').value.trim();
@@ -534,10 +664,51 @@ function renderAll() {
 
 function renderText(raw) {
   if (!raw) return '';
-  return raw.split('\n').filter(l => l.trim()).map(l => {
-    if (l.startsWith('http')) return `<p><a href="${l.trim()}" target="_blank" style="color:var(--green2);word-break:break-all;">${l.trim()}</a></p>`;
-    return `<p>${l}</p>`;
-  }).join('');
+  let qrCounter = 0;
+  const parts = [];
+  raw.split('\n').filter(l => l.trim()).forEach(l => {
+    const wifiMatch = l.match(/^\[WIFI_QR:([^:]+):([^\]]+)\]$/);
+    if (wifiMatch) {
+      const ssid24 = wifiMatch[1];
+      const pass   = wifiMatch[2];
+      const ssid5  = ssid24.replace('2.4G','5G');
+      const uid    = 'wqr' + (qrCounter++);
+      parts.push(`<div class="wifi-qr-wrap" id="${uid}">
+        <div class="wifi-qr-card" onclick="openQrModal('${ssid24}','${pass}')">
+          <div id="${uid}a"></div>
+          <div class="wifi-qr-label">${ssid24}</div>
+          <div class="wifi-qr-sub">Better range</div>
+          <div class="wifi-tap-hint">🔍 Tap to enlarge</div>
+        </div>
+        <div class="wifi-qr-card" onclick="openQrModal('${ssid5}','${pass}')">
+          <div id="${uid}b"></div>
+          <div class="wifi-qr-label">${ssid5}</div>
+          <div class="wifi-qr-sub">Faster speed</div>
+          <div class="wifi-tap-hint">🔍 Tap to enlarge</div>
+        </div>
+      </div>`);
+      // Queue QR generation after DOM is ready
+      setTimeout(() => {
+        try {
+          new QRCode(document.getElementById(uid+'a'), {
+            text: 'WIFI:T:WPA;S:'+ssid24+';P:'+pass+';;',
+            width:128, height:128, colorDark:'#2e4a3d', colorLight:'#f0f8f5',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          new QRCode(document.getElementById(uid+'b'), {
+            text: 'WIFI:T:WPA;S:'+ssid5+';P:'+pass+';;',
+            width:128, height:128, colorDark:'#2e4a3d', colorLight:'#f0f8f5',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } catch(e) { /* QR lib not loaded yet */ }
+      }, 0);
+    } else if (l.startsWith('http')) {
+      parts.push(`<p><a href="${l.trim()}" target="_blank" style="color:var(--green2);word-break:break-all;">${l.trim()}</a></p>`);
+    } else {
+      parts.push(`<p>${l}</p>`);
+    }
+  });
+  return parts.join('');
 }
 
 function renderFAQ(raw) {
@@ -732,6 +903,46 @@ function closeForgot() {
   document.getElementById('forgotOverlay').classList.remove('show');
   openLoginModal();
 }
+/* ─── WIFI QR MODAL ─── */
+let _qrModalPass = '';
+let _qrModalInstance = null;
+
+function openQrModal(ssid, pass) {
+  _qrModalPass = pass;
+  document.getElementById('qrModalSSID').textContent = ssid;
+  document.getElementById('qrModalPass').textContent = 'Password: ' + pass;
+  const canvasEl = document.getElementById('qrModalCanvas');
+  canvasEl.innerHTML = '';
+  _qrModalInstance = new QRCode(canvasEl, {
+    text: 'WIFI:T:WPA;S:' + ssid + ';P:' + pass + ';;',
+    width: 220, height: 220,
+    colorDark: '#2e4a3d', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  document.getElementById('qrModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQrModal() {
+  document.getElementById('qrModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function copyWifiPass() {
+  navigator.clipboard.writeText(_qrModalPass).then(() => {
+    showToast('✅ Password copied!');
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = _qrModalPass;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('✅ Password copied!');
+  });
+}
+
 function sendPinEmail() {
   const pin     = getPin();
   const profile = getProfile();
@@ -935,6 +1146,7 @@ function saveAllContent() {
   LS.set('niece_content', CONTENT);
   saveSections(SECTIONS);
   saveLabels(LABELS);
+  localStorage.setItem('niece_version', DATA_VERSION);
   LABELS   = getLabels();
   SECTIONS = getSections();
   renderAll();
