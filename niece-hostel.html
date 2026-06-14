@@ -836,7 +836,7 @@ function renderGuide() {
   const lists = GUIDE_DATA.map(c => {
     const items = c.items.map(item => {
       const mapBtn = item.link
-        ? `<a href="${item.link}" target="_blank" class="guide-map-btn">📍 Map</a>`
+        ? `<a href="${item.link}" class="guide-map-btn">📍 Map</a>`
         : '';
       return `<div class="guide-item">
         <div class="guide-item-info">
